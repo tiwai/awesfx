@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 #include "sffile.h"
 #include "sfitem.h"
 #include "sflayer.h"
@@ -39,21 +40,25 @@ int main(int argc, char  **argv)
 {
 	FILE *fd, *fout;
 	int piped=0;
-
-	if (argc < 2) {
-		fprintf(stderr, "no file is given\n");
-		fprintf(stderr, "usage: sf2text soundfont [outputfile]\n");
-		return 1;
-	}
-	if ((fd = fopen(argv[1], "r")) == NULL) {
-		fprintf(stderr, "can't open file %s\n", argv[1]);
-		return 1;
+	if (argc < 2 || strcmp(argv[1],"-") == 0) {
+		piped = 1;
+		fd = stdin;
+	} else {
+		if (strcmp(argv[1], "-h") ==0 || strcmp(argv[1], "--help") == 0) {
+			fprintf(stderr, "no file is given\n");
+			fprintf(stderr, "usage: sf2text soundfont [outputfile]\n");
+			return 1;
+		}
+		if ((fd = fopen(argv[1], "r")) == NULL) {
+			fprintf(stderr, "can't open file %s\n", argv[1]);
+			return 1;
+		}
 	}
 	if (awe_load_soundfont(&sfinfo, fd, !piped) < 0)
 		return 1;
 	fclose(fd);
 
-	if (argc < 3)
+	if (argc < 3 || strcmp(argv[2], "-"))
 		fout = stdout;
 	else {
 		if ((fout = fopen(argv[2], "w")) == NULL) {
@@ -124,9 +129,10 @@ void print_soundfont(FILE *fp, SFInfo *sf)
 /* print string value. escape or convert the letter to octet if necessary. */
 static void print_name(FILE *fp, char *str)
 {
-	char *p;
+	unsigned char *p;
 	putc('"', fp);
-	for (p = str; *p; p++) {
+	int i = 0;
+	for (p = str; *p && i < 20; i++, p++) {
 		if (!isprint(*p))
 			fprintf(fp, "\\%03o", *p);
 		else if (*p == '"')

@@ -41,6 +41,7 @@ static DecompRec declist[] = {
 	{".zip", "unzip -p"},
 	{".lha", "lha -pq"},
 	{".lzh", "lha -pq"},
+	{".bz2", "bzip2 -d -c"},
 };
 
 static DecompList *decopts = NULL;

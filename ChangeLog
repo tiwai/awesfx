@@ -1,3 +1,9 @@
+ver.0.5.0b
+	- patches by N. Vignot
+	  - fixed sf2text outputs for non-printable letters
+	  - fixed fskip for pipe
+	  - added .bz2 extention for open
+
 ver.0.5.0a
 	- patches by Philipp Matthias Hahn <pmhahn@titan.lahn.de>
 	  - fixed compile warnings
