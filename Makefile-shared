@@ -15,7 +15,7 @@ CINCS = -Iinclude
 # CINCS += -I/usr/src/sys/i386/isa/sound
 CDEFS = -Wall -Dlinux
 
-CFLAGS = $(CDEBUGFLAGS) $(CINCS) $(CDEFS)
+CFLAGS = $(CDEBUGFLAGS) $(CINCS) $(CDEFS) $(EXTRA_CFLAGS)
 
 INSTBINFLAGS = -c -m 0755
 INSTMANFLAGS = -c -m 0644
@@ -69,7 +69,7 @@ install.bin: $(TARGET)
 	done
 
 install.lib:
-	$(MAKE) -C awelib 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' install
+	$(MAKE) -C awelib 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'EXTRA_CFLAGS=$(EXTRA_CFLAGS)' 'INSTDIR=$(INSTDIR)' install
 	@if [ ! -d $(INCDIR) ]; then \
 	mkdir -p $(INCDIR); \
 	fi; \
@@ -93,13 +93,13 @@ install.man: $(MANFILES) $(DEPLIB)
 	manfile=`echo $$i | sed -e 's/\.man$$/\.$(MANSUFFIX)/g'` ; \
 	$(INSTALL) $(INSTMANFLAGS) $$i $(MANDIR)/man$(MANSUFFIX)/$$manfile ; \
 	done
-	$(MAKE) -C awelib 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' install.man
+	$(MAKE) -C awelib 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'EXTRA_CFLAGS=$(EXTRA_CFLAGS)' 'INSTDIR=$(INSTDIR)' install.man
 
 $(DEPLIB):
 	@echo "making $(DEPLIB) in awelib.."
-	$(MAKE) -C awelib 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' all
+	$(MAKE) -C awelib 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'EXTRA_CFLAGS=$(EXTRA_CFLAGS)' 'INSTDIR=$(INSTDIR)' all
 
 clean:
 	$(RM) $(TARGET)
 	$(RM) *.o
-	$(MAKE) -C awelib 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' clean
+	$(MAKE) -C awelib 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'EXTRA_CFLAGS=$(EXTRA_CFLAGS)' 'INSTDIR=$(INSTDIR)' clean

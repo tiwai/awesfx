@@ -14,7 +14,7 @@ CINCS = -Iinclude
 # CINCS += -I/usr/src/sys/i386/isa/sound
 CDEFS = -Wall -Dlinux
 
-CFLAGS = $(CDEBUGFLAGS) $(CINCS) $(CDEFS)
+CFLAGS = $(CDEBUGFLAGS) $(CINCS) $(CDEFS) $(EXTRA_CFLAGS)
 
 INSTBINFLAGS = -c -m 0755
 INSTMANFLAGS = -c -m 0644
@@ -77,7 +77,7 @@ install.samples:
 	done
 
 install.lib:
-	$(MAKE) -C $(SUBDIR) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' install
+	$(MAKE) -C $(SUBDIR) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'EXTRA_CFLAGS=$(EXTRA_CFLAGS)' 'INSTDIR=$(INSTDIR)' install
 
 install.bank:
 	@if [ ! -d $(BANDIR) ]; then \
@@ -95,13 +95,13 @@ install.man: $(MANFILES) $(DEPLIB)
 	manfile=`echo $$i | sed -e 's/\.man$$/\.$(MANSUFFIX)/g'` ; \
 	$(INSTALL) $(INSTMANFLAGS) $$i $(MANDIR)/man$(MANSUFFIX)/$$manfile ; \
 	done
-	$(MAKE) -C $(SUBDIR) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' install.man
+	$(MAKE) -C $(SUBDIR) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'EXTRA_CFLAGS=$(EXTRA_CFLAGS)' 'INSTDIR=$(INSTDIR)' install.man
 
 $(DEPLIB):
 	@echo "making $(DEPLIB) in $(SUBDIR).."
-	$(MAKE) -C $(SUBDIR) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' all
+	$(MAKE) -C $(SUBDIR) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'EXTRA_CFLAGS=$(EXTRA_CFLAGS)' 'INSTDIR=$(INSTDIR)' all
 
 clean:
 	$(RM) $(TARGET)
 	$(RM) *.o
-	$(MAKE) -C $(SUBDIR) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' clean
+	$(MAKE) -C $(SUBDIR) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'EXTRA_CFLAGS=$(EXTRA_CFLAGS)' 'INSTDIR=$(INSTDIR)' clean
