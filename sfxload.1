@@ -4,9 +4,11 @@
 sfxload, asfxload \- load a SoundFont file on the Emux WaveTable
 
 .SH SYNOPSIS
-sfxload [\-options] fontfile
+.B sfxload
+.RI [\| \-options \|] " fontfile"
 
-asfxload [\-options] fontfile
+.B asfxload
+.RI [\| \-options \|] " fontfile"
 
 .SH DESCRIPTION
 .B sfxload
@@ -17,15 +19,16 @@ and instruments data in a SoundFont file to the AWE32 sound driver,
 or to the Emux WaveTable of ALSA sbawe and emu10k1 drivers.
 This program is necessary for playing MIDI samples via sequencer
 programs supporting AWE driver.  There is no big difference between
-sfxload and asfxload except for that asfxload is for ALSA and sfxload
-is for OSS, respecitvely.  The options to specify devices are
+\fBsfxload\fP and \fBasfxload\fP except for that \fBasfxload\fP is for
+ALSA and \fBsfxload\fP is for OSS, respecitvely. The options to specify
+devices are
 different between them (see below).
 
 Basically, sfxload behaves as two ways.
 .in +1i
 % sfxload fontfile
 .br
-% sfxload -b1 fontfile
+% sfxload \-b1 fontfile
 .in -1i
 
 The first usage is to read SF2 (or SBK) file and transfer to the awe
@@ -34,59 +37,53 @@ replaced with the new one.
 In the second case, sfxload reads the file and appends it to the
 pre-loaded samples on the driver with specified bank number.  The old
 samples remain in the driver.  The additional samples can be cleared
-via
-.B \-x
-option (see below).
+via \fB\-x\fP option (see below).
 
 The sound files are searched through the path list.  The path list is
-defined as built-in.  If the environment variable
-.B SFBANKDIR
-or the
-command line option
-.B \-P
-is given, it replaces the default search list.
-The file extension .sf2, and .sbk can be abbreviated.
+defined as built-in.  If the environment variable \fBSFBANKDIR\fP or the
+command line option \fB\-P\fP is given, it replaces the default search list.
+The file extension \fI.sf2\fP, and \fI.sbk\fP can be abbreviated.
 
 .SH OPTIONS
 .TP
-.B \-F, --device=file (sfxload only)
+.BI \-F,\ \-\-device= file " \fR(sfxload only)\fP"
 Specify the device file to be used.
-Default value is /dev/sequencer.
+Default value is
+.IR /dev/sequencer .
 .TP
-.B \-D, --index=number (sfxload only)
+.BI \-D,\ \-\-index= number " \fR(sfxload only)\fP"
 Specify the device index of AWE driver.
-Negative number (e.g. -1) means to probe the first AWE device automatically.
+Negative number (e.g. \-1) means to probe the first AWE device automatically.
 For selecting the other AWE cards, a positive index number must be given here.
-Default value is -1.
+Default value is \fB\-1\fP.
 .TP
-.B \-D, --hwdep=name (asfxload only)
+.BI \-D,\ \-\-hwdep= name " \fR(asfxload only)\fP"
 Specify the hwdep name to be used.
 As default, asfxload seeks until any Emux compatible hwdep device is found.
 .TP
-.B \-i, --clear[=bool]
+.BI \-i,\ \-\-clear "\fR[=\fPbool\fR]\fP"
 Remove all samples before loading the fonts.
 This is an explicit directive (see -b option).
 If this option is specified alone without soundfont file
 arguments, sfxload does onlay remove samples.
-Either of "on", "off", "yes", "no", "true", or "false" can be
-specified as an optional argument.
+Either of \fBon\fP, \fBoff\fP, \fByes\fP, \fBno\fP, \fBtrue\fP,
+or \fBfalse\fP can be specified as an optional argument.
 .TP
-.B \-x, --remove[=bool]
-Remove the optional samples previouly loaded via -b option.
+.BI \-x,\ \-\-remove "\fR[=\fPbool\fR]\fP"
+Remove the optional samples previouly loaded via \fB\-b\fP option.
 Otherwise, all new samples are simply appended.
 .TP	
-.B \-N, --increment[=bool]
-Do not clear samples even with the absence of -b option.
-However, this option is not exclusive with -x option.  If both 
-options are specified, and the memory full error is
-encountered during loading fonts, sfxload will try to remove
+.BI \-N,\ \-\-increment "\fR[=\fPbool\fR]\fP"
+Do not clear samples even with the absence of \fB\-b\fP option.  However, this option is not exclusive with
+.B \-x
+option. If both options are specified, and the memory full error is
+encountered during loading fonts, \fBsfxload\fP will try to remove
 samples and load the fonts again.
 .TP
-.B \-b, --bank=number
+.BI \-b,\ \-\-bank= number
 Append the sound samples on the specified bank.
 Without this option, all present samples in the driver are
-removed before loading the new fonts unless -N option is
-specified.  Usually, this option is necessary to load user
+removed before loading the new fonts unless \fB\-N\fP option is specified. Usually, this option is necessary to load user
 bank, typically in bank one.
 For example,
 .in +1i
@@ -96,14 +93,14 @@ For example,
 .br
 .in -1i
 .TP
-.B \-l, --lock[=bool]
+.BI \-l,\ \-\-lock "\fR[=\fPbool\fR]\fP"
 Lock the font.  The locked font is no longer removed via
-remove option (-x) even if it's loaded together with -b option.
+remove option (\fB\-x\fP) even if it's loaded together with \fB\-b\fP option.
 .TP
-.B \-C, --compat[=bool]
+.BI \-C,\ \-\-compat "\fR[=\fPbool\fR]\fP"
 Use the old (v0.4.2) parameter calculations.
 .TP
-.B \-A, --sense=sensitivity
+.BI \-A,\ \-\-sense= sensitivity
 (Only valid on compatible mode)
 .br
 Set sample attenuation sensitivity.
@@ -111,69 +108,68 @@ This option controls the sensitivity of initial attenuation parameter
 of each instrument defined in SoundFont file.
 In the program, each parameter is calculated from the value divided
 by this number for the original value.
-The number 1.0 means that the original initial attenuation parameters
+The number \fI1.0\fP means that the original initial attenuation parameters
 would be used.
 Generally, smaller number makes drum sounds louder.
-(I think -A 2 would be similar to Windows sounds.)
-The default value is 10. 
+(I think \fB"-A 2"\fP would be similar to Windows sounds.)
+The default value is \fI10\fP.
 Note that this option changes also the default attenuation automatically (see below).
 .TP
-.B \-a, --atten=attenuation
+.BI \-a,\ \-\-atten= attenuation
 (Only valid on compatible mode)
 .br
 Set the default attenuation level.
 This option controls the minimum attenuation of the sample.
 The parameter is given in raw digit number for AWE driver,
 that is, in 8/3 dB unit.
-Since --sense option changes the default attenuation automatically,
-specify this option later from --sense option.
-The default value is 32.
+Since \fB\-\-sense\fP option changes the default attenuation automatically,
+specify this option later from \fB\-\-sense\fP option.
+The default value is \fI32\fP.
 .TP
-.B \-d, --decay=scale
+.BI \-d,\ \-\-decay= scale
 (Only valid on compatible mode)
 .br
-Set the scale of envelope decay time.  Default value is 50.0.
+Set the scale of envelope decay time.  Default value is \fI50.0\fP.
 Sounds decay fast when larger number is set.
-The ver.0.3 sfxload uses 54.8.  If you want to keep the same
+The ver.0.3 sfxload uses \fI54.8\fP.  If you want to keep the same
 sound, use this number instead.
 .TP
-.B \-M, --memory[=bool]
+.BI \-M,\ \-\-memory "\fR[=\fPbool\fR]\fP"
 Display the left memory size in DRAM on the AWE32 card.
 .TP
-.B \-c, --chorus=percent
+.BI \-c,\ \-\-chorus= percent
 Specify the effects of chorus.
 The value is in percent, from 0 to 100.  The default is unspecified.
 This value may be overwritten by MIDI control messages.
 .TP
-.B \-r, --reverb=percent
+.BI \-r,\ \-\-reverb= percent
 Specify the effects of reverb.
 The value is in percent, from 0 to 100.  The default is unspecified.
 This value may be overwritten by MIDI control messages.
 .TP
-.B \-B, --addblank[=bool]
+.BI \-B,\ \-\-addblank "\fR[=\fPbool\fR]\fP"
 Add 48 size of blank loop on each sample data.  Usually, this
 option is not necessary.  Most of soundfont files are designed 
 well for enough blank loops for each sample.
 .TP
-.B \-L, --extract=source[:map]
+.BI \-L,\ \-\-extract= source \fR[:\fP map \fR]\fP
 Extract and load only the specified preset(s).
 This option is usually employed by drvmidi.
 The preset is given as same as in virtual bank file.
 .TP
-.B \-v, --verbose[=level]
+.BI \-v,\ \-\-verbose "\fR[=\fPlevel\fR]\fP"
 Increase or set the verbosity level.
 .TP
-.B \-V, --volume=percent
+.BI \-V,\ \-\-volume= percent
 Specify the total volume of sounds, provided in percent.
-The default volume is 70%.
+The default volume is \fI70%\fP.
 .TP
-.B \-P, --path=path1:path2:pathN
+.BI \-P,\ \-\-path= path1 : path2 : pathN
 Specify the search path list.
 The sound files are searched from
-.I path1, path2,
-and so on.
+\fIpath1\fP, \fIpath2\fP, and so on.
 This overrides both the system path and environment variable
-.B SFBANKDIR.
+\fBSFBANKDIR\fP.
 
 .SH "VIRTUAL BANK FILE"
 The virtual bank file is a list of presets treated as one soundfont
@@ -195,12 +191,12 @@ The preset is described by the following three values,
 .in +1i
 	preset/bank/keynote
 .in -1i
-If bank and keynote are omitted, bank 0 and keynote -1 (meaning to
+If bank and keynote are omitted, bank 0 and keynote \-1 (meaning to
 search all keys) are applied.
 
 The third item is the name of soundfont file.  The file is searched
 from the prescribed search-path.  The remaining arguments are
-ignored in sfxload.
+ignored in \fBsfxload\fP.
 
 If the soundfont name is omitted, sfxload loads it as preset
 mapping.  It just behaves like a symbolic link of file opposing to
@@ -209,12 +205,12 @@ but searched first when the note is played.
 
 A couple of special commands can be used together with the virtual
 presets above.
-.B default
+\fBdefault\fP
 command is used to specify the default
 soundfont file.  Any other presets which are not defined in the
 virtual preset lists are loaded from this default font.  For
-example, in the following virtual bank, 2mbgmgs.sf2 is used except
-for standard drumsets which employs drum.sf2:
+example, in the following virtual bank, \fI2mbgmgs.sf2\fP is used except
+for standard drumsets which employs \fIdrum.sf2\fP:
 .in +1i 
 	0/128:0/128:drum.sf2
 .br
@@ -222,7 +218,7 @@ for standard drumsets which employs drum.sf2:
 .in -1i
 
 Another special command is
-.B include
+\fBinclude\fP
 command.  This simply includes
 another virtual bank file under the current position. For example,
 .in +1i
@@ -238,29 +234,29 @@ another virtual bank file under the current position. For example,
 The default option arguments can be stored in the system resource file.
 There are two files loaded as default.
 .in +1i
-$HOME/.sfxloadrc
+.I $HOME/.sfxloadrc
 .br
-/etc/sfxloadrc
+.I /etc/sfxloadrc
 .in -1i
 
 The syntax is as follows:
 .in +1i
-fontname -options..
+fontname \-options..
 .in -1i
 The first argument is soundfont file name for each option.
 The remaining arguments are identical with command line options.
 The font name
-.I default
+\fIdefault\fP
 is used for default options for all sound
 fonts.  The default options are overridden by specific options or
 command line options.
 
 For example, to set default chorus level 20 except for synthgm font,
-you can write a resource file ~/.sfxloadrc like that:
+you can write a resource file \fI~/.sfxloadrc\fP like that:
 .in +1i
-default	--chorus=20
+default	\-\-chorus=20
 .br
-synthgm --chorus=0
+synthgm \-\-chorus=0
 .in -1i
 
 
@@ -271,7 +267,7 @@ Search path for sound files.  The current directory is always searched
 at first.
 
 .SH "SEE ALSO"
-drvmidi(1)
+.BR drvmidi (1)
 
 .SH COPYRIGHT
 Copyright (C) 1996-2003 Takashi Iwai.
