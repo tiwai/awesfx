@@ -48,7 +48,7 @@ static void read_option_file(void)
 
 	*rcfile = 0;
 	if ((p = getenv("HOME")) != NULL && *p) {
-		sprintf(rcfile, "%s/%s", p, RCFILE);
+		snprintf(rcfile, sizeof(rcfile), "%s/%s", p, RCFILE);
 		if (access(rcfile, R_OK) != 0)
 			rcfile[0] = 0;
 	}
