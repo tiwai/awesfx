@@ -26,7 +26,7 @@
 #include "sffile.h"
 
 #ifndef BUILD_BIG_ENDIAN
-#if defined(ENDIAN) and defined(BIG_ENDIAN)
+#if defined(ENDIAN) && defined(BIG_ENDIAN)
 #ifdef ENDIAN==BIG_ENDIAN
 #define BUILD_BIG_ENDIAN
 #endif
