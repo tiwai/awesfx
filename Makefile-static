@@ -68,6 +68,14 @@ install.bin: $(TARGET)
 	$(INSTALL) $(INSTBINFLAGS) $$i $(BINDIR); \
 	done
 
+install.samples:
+	@if [ ! -d $(BANKDIR) ]; then \
+	mkdir -p $(BANKDIR); \
+	fi; \
+	for i in samples/*; do \
+	$(INSTALL) $(INSTBNKFLAGS) $$i $(BANKDIR); \
+	done
+
 install.lib:
 	$(MAKE) -C $(SUBDIR) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' install
 
