@@ -1,0 +1,21 @@
+#
+# GS compatible bank for chaos12m
+# GS parts taken from chaos8m
+#
+
+# load from bank #1 to #9 in chaos8m.sf2
+*/1:*/1:chaos8m
+*/2:*/2:chaos8m
+*/3:*/3:chaos8m
+*/4:*/4:chaos8m
+*/5:*/5:chaos8m
+*/6:*/6:chaos8m
+*/7:*/7:chaos8m
+*/8:*/8:chaos8m
+*/9:*/9:chaos8m
+
+# load XG mapping
+include xgmap.bnk
+
+# Chaos 12MB fonts
+default chaos12m

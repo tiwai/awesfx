@@ -1,0 +1,78 @@
+* CONTENTS
+
+This directory contains some samples of virtual bank files.
+
+[Bank Files for 512k DRAM]
+default-2m.bnk 	- bank file for dynamic loading of GS sounds
+	Use this file with --dynamic option of drvmidi.
+	2mbgmgs.sf2 font is used except footsteps sound.
+	synthgs.sbk is used only for footsteps instead.
+
+xgdefault.bnk	- bank file for dynamic loading of GS/XG sounds
+	Use this file together with --dynamic and --xgmap=on.
+	This file includes the other three XG mapping files below.
+	You'll need to install all the files.
+
+[Bank File for 8MB DRAM]
+emu8m.bnk	- bank file for 8mbgmsfx.sf2 from Emu
+	This file includes GS instruments from 2mbgmgs.sf2, and
+	XG mapping files.  The whole file can be loaded on 8MB DRAM.
+
+ch12msup.bnk	- bank file for chaos12m.sf2 from Chaos
+	For dynamic loading 12MB fonts on 8MB DRAM.
+	This file includes chaos8m.sf2 font for some GS parts.
+	The XG mapping files must be also installed.
+
+[Bank Files for XG mapping]
+xgsfx.bnk 	- bank file for XG SFX kit
+	Many preset mappings are defined on this file for XG SFX
+	sounds.  Use this file with --xgmap=on option of drvmidi.
+	If this option is enabled, bank #64 and #126 are used as
+	XG SFX banks.
+
+xgdrum.bnk	- bank file for XG Drum kit	
+	Many preset mappings are defined on this file for XG Drum
+	sounds.  Use this file with --xgmap=on option of drvmidi.
+	If this option is enabled, from drumset #64 to #126 are used
+	for XG drum sounds.
+
+xgmap.bnk	- bank file for XG mapping
+	Just including both two files above.
+
+
+* HOW TO PLAY XG MIDI FILES
+
+- Copy all the bank files above to the soundfont bank directory,
+  as default, /usr/local/lib/sfbank or /dos/sb32/sfbank.
+  The default bank directory is defined in awelib/config.h.
+  If you'll use another GS soundfont, specify it in default.bnk.
+
+- If you have only 512k DRAM on the soundcard, use dynamic loading.
+  Set the default options of drvmidi in ~/.drvmidirc as follows:
+
+	default --xgmap=on --dynamic=xgdefault.bnk
+
+  xgdefault.bnk contains both GS/GM fonts and XG mappings.
+
+  Otherwise, if you have enough DRAM, you can load all the fonts at
+  once on the driver.  Then, set --xgmap option only in the default
+  option of drvmidi,
+
+	default --xgmap=on
+  
+- Load the font file before starting tkmidi or drvmidi.
+  In the case of dynamic loading, ROM soundfont should be used:
+
+	% sfxload synthgm
+
+  In the case of static loading, load all the font at this time:
+
+	% sfxload xgdefault.bnk
+
+- Run tkmidi or drvmidi, and enjoy.
+
+	tkmidi *.mid
+
+
+----------------
+Takashi Iwai	<iwai@ww.uni-erlangen.de>

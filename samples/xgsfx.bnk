@@ -1,0 +1,100 @@
+#
+# SAMPLE MAP FILE FOR XG SFX SOUNDS
+#
+# Use this file with --xgmap=on option for drvmidi
+#
+
+# bank 64: XG SFX bank
+
+120/1:0/64	# cut noise
+120/1:1/64	# cut noise 2
+120/1:2/64	# dist cut noise
+120/2:3/64	# string slap
+120/0:4/64	# bass slide
+120/0:5/64	# pick strape
+121/0:16/64	# fl key click
+122/1:32/64	# train
+122/2:33/64	# thunder
+122/3:34/64	# wind
+122/4:35/64	# stream
+122/5:36/64	# bubble
+125/127:37/64	# feed
+123/1:48/64	# dog
+123/2:49/64	# horse gallop
+123/0:50/64	# bird
+124/0:64/64	# telephone
+124/2:65/64	# door creaking
+124/3:66/64	# door slam
+124/4:67/64	# scratch
+124/4:68/64	# scratch 2
+124/5:69/64	# wind chime
+124/1:70/64	# telephone 2
+125/1:80/64	# car engine
+125/2:81/64	# car stop
+125/3:82/64	# car pass
+125/4:83/64	# car crash
+125/5:84/64	# siren
+125/6:85/64	# train
+125/7:86/64	# jetplane
+125/8:87/64	# starship
+125/9:88/64	# burst noise
+125/0:89/64	# coarster
+126/1:96/64	# laughing
+126/2:97/64	# screaming
+126/3:98/64	# punch
+126/4:99/64	# heart beat
+126/5:100/64	# footsteps
+126/0:101/64	# applause
+127/1:112/64	# machine gun
+127/2:113/64	# laser gun
+127/3:114/64	# explosion
+127/0:115/64	# fire work
+
+# bank 126, preset0: XG sfx keyboard map
+
+120/1/60:0/126/36	# cut noise
+120/1/60:0/126/37	# cut noise 2
+120/1/60:0/126/38	# dist cut noise
+120/2/60:0/126/39	# string slap
+120/0/60:0/126/40	# bass slide
+120/0/60:0/126/41	# pick slide
+121/1/60:0/126/52	# fl key click
+122/1/60:0/126/68	# rain
+122/2/60:0/126/69	# thunder
+122/3/60:0/126/79	# wind
+122/4/60:0/126/71	# stream
+122/5/60:0/126/72	# bubble
+125/127/60:0/126/73	# feed
+123/1/60:0/126/84	# dog
+123/2/60:0/126/85	# horse gallop
+123/0/60:0/126/86	# bird 2
+
+# bank 126, preset1: XG sfx keyboard map
+
+124/1/60:1/126/36	# telephone 2
+124/2/60:1/126/37	# door creaking
+124/3/60:1/126/38	# door slam
+124/4/60:1/126/39	# scratch
+124/4/60:1/126/40	# scratch 2
+124/5/60:1/126/41	# wind chime
+124/0/60:1/126/42	# telephone ring
+125/1/60:1/126/52	# engine start
+125/2/60:1/126/53	# stop
+125/3/60:1/126/54	# car pass
+125/4/60:1/126/55	# crash
+125/5/60:1/126/56	# siren
+125/6/60:1/126/57	# train
+125/7/60:1/126/58	# jetplane
+125/8/60:1/126/59	# starship
+125/9/60:1/126/60	# burst noise
+125/0/60:1/126/61	# coarster
+126/1/60:1/126/68	# laughing
+126/2/60:1/126/69	# screaming
+126/3/60:1/126/70	# punch
+126/4/60:1/126/71	# heart beat
+126/5/60:1/126/72	# footsteps
+126/0/60:1/126/73	# applause
+127/1/60:1/126/84	# machine gun
+127/2/60:1/126/85	# laser gun
+127/3/60:1/126/86	# explosion
+127/0/60:1/126/87	# fire work

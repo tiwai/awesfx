@@ -1,0 +1,126 @@
+#
+# XG ADDITIONAL DRUM MAPPING
+#
+# Use this file with --xgmap=on option for drvmidi
+#
+
+# standard kit 1; preset number is shifted to 64
+
+0/128:64/128		# map standard 1 from original fonts (preset#0)
+
+0/128/86:64/128/13	# surdo mute
+0/128/87:64/128/14	# surdo open
+0/128/27:64/128/15	# hi-Q
+0/128/28:64/128/16	# whip slap
+0/128/29:64/128/17	# scratch push
+0/128/30:64/128/18	# scratch pull
+#0/128/26:64/128/19	# finger snap
+0/128/33:64/128/19	# finger snap
+0/128/32:64/128/20	# click noise
+0/128/33:64/128/21	# metronome click
+0/128/34:64/128/22	# metromome bell
+0/128/32:64/128/23	# seq click L
+0/128/32:64/128/24	# seq click H
+40/128/38:64/128/25	# brush tap
+40/128/40:64/128/26	# brush swirl L
+40/128/39:64/128/27	# brush slap
+50/128/90:64/128/28	# brush swirl H
+0/128/25:64/128/29	# snare roll
+0/128/88:64/128/30	# castanet
+0/128/38:64/128/31	# snare L
+0/128/31:64/128/32	# sticks
+25/128/35:64/128/33	# BD L
+#64/128/34		# open rim shot
+
+# standard kit 2
+
+1/128:65/128		# map standard 2
+
+1/128/86:65/128/13	# surdo mute
+1/128/87:65/128/14	# surdo open
+1/128/27:65/128/15	# hi-Q
+1/128/28:65/128/16	# whip slap
+1/128/29:65/128/17	# scratch push
+1/128/30:65/128/18	# scratch pull
+#1/128/26:65/128/19	# finger snap
+1/128/33:65/128/19	# finger snap
+1/128/32:65/128/20	# click noise
+1/128/33:65/128/21	# metronome click
+1/128/34:65/128/22	# metromome bell
+1/128/32:65/128/23	# seq click L
+1/128/32:65/128/24	# seq click H
+40/128/38:65/128/25	# brush tap
+40/128/40:65/128/26	# brush swirl L
+40/128/39:65/128/27	# brush slap
+50/128/90:65/128/28	# brush swirl H
+1/128/25:65/128/29	# snare roll
+1/128/88:65/128/30	# castanet
+1/128/38:65/128/31	# snare L
+1/128/31:65/128/32	# sticks
+25/128/35:65/128/33	# BD L
+#65/128/34		# open rim shot
+
+# electronic kit #24
+
+24/128:88/128		# map default
+
+24/128/86:88/128/13	# surdo mute
+24/128/87:88/128/14	# surdo open
+24/128/27:88/128/15	# hi-Q
+24/128/28:88/128/16	# whip slap
+24/128/29:88/128/17	# scratch push
+24/128/30:88/128/18	# scratch pull
+#24/128/26:88/128/19	# finger snap
+24/128/33:88/128/19	# click noise
+24/128/32:88/128/20	# click noise
+24/128/33:88/128/21	# metronome click
+24/128/34:88/128/22	# metromome bell
+24/128/32:88/128/23	# seq click L
+24/128/32:88/128/24	# seq click H
+40/128/38:88/128/25	# brush tap
+40/128/40:88/128/26	# brush swirl L
+40/128/39:88/128/27	# brush slap
+119/0/60:88/128/28	# reverse cymbal
+24/128/25:88/128/29	# snare roll
+24/128/27:88/128/30	# hi-Q
+24/128/38:88/128/31	# snare L
+24/128/31:88/128/32	# sticks
+25/128/35:88/128/33	# BD L
+#88/128/34		# open rim shot
+24/128/29:88/128/78	# scratch push
+24/128/30:88/128/79	# scratch pull
+
+# analog kit #25
+
+25/128:89/128		# map default
+
+24/128/86:89/128/13	# surdo mute
+24/128/87:89/128/14	# surdo open
+24/128/27:89/128/15	# hi-Q
+24/128/28:89/128/16	# whip slap
+24/128/29:89/128/17	# scratch push
+24/128/30:89/128/18	# scratch pull
+#24/128/26:89/128/19	# finger snap
+24/128/33:89/128/19	# click noise
+24/128/32:89/128/20	# click noise
+24/128/33:89/128/21	# metronome click
+24/128/34:89/128/22	# metromome bell
+24/128/32:89/128/23	# seq click L
+24/128/32:89/128/24	# seq click H
+40/128/38:89/128/25	# brush tap
+40/128/40:89/128/26	# brush swirl L
+40/128/39:89/128/27	# brush slap
+119/0/60:88/128/28	# reverse cymbal
+24/128/25:89/128/29	# snare roll
+24/128/27:89/128/30	# hi-Q
+24/128/38:89/128/31	# snare L
+24/128/31:89/128/32	# sticks
+25/128/35:89/128/33	# BD L
+#89/128/34		# open rim shot
+24/128/29:89/128/78	# scratch push
+24/128/30:89/128/79	# scratch pull
+
+# orchestra kit #48
+
+48/128:114/128
+

@@ -1,0 +1,6 @@
+#
+# XG BANK FILE FOR STATIC LOADINIG
+#
+
+include xgsfx.bnk
+include xgdrum.bnk

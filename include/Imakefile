@@ -1,0 +1,11 @@
+#include "../awelib/config.h"
+
+INSTDIR = /usr/local
+INCDIR = $(INSTDIR)/include/awe
+
+HEADERS = awebank.h aweseq.h awe_parm.h sffile.h itypes.h sfitem.h sflayer.h\
+	sfopts.h slist.h util.h
+
+#ifdef INSTALL_AWELIB
+InstallMultiple($(HEADERS), $(INCDIR))
+#endif

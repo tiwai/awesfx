@@ -1,0 +1,427 @@
+================================================================
+    AWE32 Sound Driver Utility Programs for Linux / FreeBSD
+		version 0.4.3c; Jan. 14, 2000
+
+		Takashi Iwai <iwai@ww.uni-erlangen.de>
+================================================================
+
+----------------------------------------------------------------
+* GENERAL NOTES
+
+Thie package includes a couple of utilities for AWE32 sound driver on
+Linux and FreeBSD systems.  You need to use these utilities to enable
+sounds on the driver properly.
+
+Ver.0.4.3 improves the parameter calculation as almost compatible with
+the DOS/Win drivers.  This is more effective in the case of ROM sounds.
+If you prefer the old type sounds, use --compatible option.
+
+This packaing contains the following programs:
+
+ - sfxload	SoundFont file loader
+ - setfx	Chorus/reverb effect loader
+ - aweset	Change the running mode of AWE driver
+ - sf2text	Convert SoundFont to readable text
+ - text2sf	Revert from text to SoundFont file
+ - gusload	GUS PAT file loader
+ - sfxtest	Example program to control AWE driver
+
+The package includes the correction of SoundFont managing routines,
+called AWElib.  As default, the AWElib is installed as a shared
+library.
+
+----------------------------------------------------------------
+* SFXLOAD
+
+SFXLOAD is a utility program to transfer the sound wave and
+instruments data in a SoundFont file to the AWE32 sound driver.
+This program is necessary for playing MIDI samples via sequencer
+programs supporting AWE driver.
+
+Basically, sfxload behaves as two ways.
+
+	% sfxload fontfile
+	% sfxload -b1 fontfile
+
+The first usage is to read SF2 (or SBK) file and transfer to the awe
+driver.  In this case, the samples which were loaded on the driver are
+replaced with the new one.
+In the second case, sfxload reads the file and appends it to the
+pre-loaded samples on the driver with specified bank number.  The old
+samples remain in the driver.  The additional samples can be cleared
+via -x option (see below).
+
+The sound files are searched through the path list.  The path list is
+defined as built-in.  If the environment variable SFBANKDIR or the
+command line option -P is given, it replaces the default search list.
+The file extension .sf2, and .sbk can be abbreviated.
+
+The new sfxload can deal with a virtual bank file.  It contains
+a list of presets from various soundfonts.  See the virtual bank file
+section for more details.
+
+
+OPTIONS:
+
+  -i, --clear[=bool]
+	Remove all samples before loading the fonts.
+	This is an explicit directive (see -b option).
+	If this option is specified alone without soundfont file
+	arguments, sfxload does onlay remove samples.
+	Either of "on", "off", "yes", "no", "true", or "false" can be
+	specified as an optional argument.
+	
+  -x, --remove[=bool]
+  	Remove the optional samples previouly loaded via -b option.
+	Otherwise, all new samples are simply appended.
+
+  -N, --increment[=bool]
+	Do not clear samples even with the absence of -b option.
+	However, this option is not exclusive with -x option.  If both 
+	options are specified, and the memory full error is
+	encountered during loading fonts, sfxload will try to remove
+	samples and load the fonts again.
+
+  -b, --bank=number
+	Append the sound samples on the specified bank.
+	Without this option, all present samples in the driver are
+	removed before loading the new fonts unless -N option is
+	specified.  Usually, this option is necessary to load user
+	bank, typically in bank one.
+
+	eg)
+		% sfxload synthgm.sbk
+		% sfxload -b1 surprise.sf2
+
+  -l, --lock[=bool]
+	Lock the font.  The locked font is no longer removed via
+	remove option (-x) even if it's loaded together with -b
+	option.
+
+  -C, --compat[=bool]
+	Use the old (v0.4.2) parameter calculations.
+	
+  -A, --sense=sensitivity
+  -a, --atten=attenuation
+	(Only valid on compatible mode)
+
+	These options are used to control the attenuation of samples.
+	The former defines the sensitivity of initial attenuation 
+	parameter of each instrument in SoundFont file.  In the
+	program, the actual attenuaton is calculated from the divided
+	value by this sensitivity from the original parameter.  Then,
+	1.0 means to use the original parameter without modification.
+	Generally, smaller number makes drum sounds louder.  The
+	default value is 10.  (I think -A 2 would be similar to
+	Windows sounds.)
+
+	The latter option defines the minimum attenuation.  The value
+	is given in the raw parameter for AWE driver, that is, in 8/3
+	dB unit.  The default value is 32.  Note that since -A option
+	will change the minimum attenuation automatically, the option
+	-a must be speicifed later from -A option.
+
+  -d, --decay=scale
+	(Only valid on compatible mode)
+
+	Set the scale of envelope decay time.  Default value is 50.0.
+	Sounds decay fast when larger number is set.
+
+	The ver.0.3 sfxload uses 54.8.  If you want to keep the same
+	sound, use this number instead.
+
+  -B, --addblank[=bool]
+	Add 48 size of blank loop on each sample data.  Usually, this
+	option is not necessary.  Most of soundfont files are designed 
+	well for enough blank loops for each sample.
+
+  -M, --memory[=0|1]
+	Display the left memory size of DRAM on the AWE32 card.
+
+  -c, --chorus=percent
+  -r, --reverb=percent
+	Specify the effects of chorus and reverb, respectively.  The
+	value is in percent, from 0 to 100.  The default is
+	unspecified.
+	Note: these values may be overwritten by MIDI control
+	messages. 
+
+  -L, --extract=source[:map]
+	Extract and load only the specified preset(s).
+	This option is usually employed by drvmidi.
+	The preset is given as same as in virtual bank file.
+
+  -v, --verbose[=level]
+	Increase or set the verbosity level.
+
+  -V, --volume=percent
+	Set the total volume of sounds, provided in percent.
+	Default volume is 70%.
+
+  -P, --path=path1:path2:...
+	Specify the search path for sound files.  It overrides both
+	the system path and environment variable SFBANKDIR.
+
+  -d, --device=file
+	Specify the device file name.  As default, /dev/sequencer
+	is used.
+
+VIRTUAL BANK FILE:
+
+  The virtual bank file is a list of presets treated as one soundfont
+  file.  The syntax of virtual bank is as follows:
+
+	# comments
+	source:map[:soundfont [preset-name]
+	source:map[:soundfont [preset-name]
+	...
+
+  The first and second items are the source and mapped presets,
+  respectively.  The former is the existing preset in the soundfont,
+  and the latter is the actual preset loaded on the sound driver.
+  The preset is described by the following three values,
+
+	preset/bank/keynote
+
+  If bank and keynote are omitted, bank 0 and keynote -1 (meaning to
+  search all keys) are applied.
+
+  The third item is the name of soundfont file.  The file is searched
+  from the prescribed search-path.  The remaining arguments are
+  ignored in sfxload.
+
+  If the soundfont name is omitted, sfxload loads them as preset
+  mapping.  It just behaves like a symbolic link of file opposing to
+  copying of the file.  Any sample data is not referred at this time,
+  but searched first when the note is played.
+
+  A couple of special commands can be used together with the virtual
+  presets above.  "default" command is used to specify the default
+  soundfont file.  Any other presets which are not defined in the
+  virtual preset lists are loaded from this default font.  For
+  example, in the following virtual bank, 2mbgmgs.sf2 is used except
+  for standard drumsets which employs drum.sf2:
+ 
+	0/128:0/128:drum.sf2
+	default 2mbgmgs.sf2
+
+  Another special command is "include" command.  This simply includes
+  another virtual bank file under the current position.
+  For example,
+
+	default standard.sf2
+	0/128:0/128:drum.sf2
+	include xgsfx.bnk
+
+
+SYSTEM RESOURCE FILE:
+
+  You can set default option arguments in the system resource file.
+  There're two files loaded as default.
+
+	$HOME/.sfxloadrc
+	/etc/sfxloadrc
+
+  The syntax is as follows:
+
+	fontname options..
+
+  The first argument is soundfont file name for each option.  The
+  remaining arguments are identical with command line options.
+  The font name "default" is used for default options for all sound
+  fonts.  The default options are overridden by specific options or
+  command line options.
+
+  For example, to set default chorus level 20 except for synthgm font,
+  you can write a resource file ~/.sfxloadrc like that:
+
+	default	--chorus=20
+	synthgm --chorus=0
+
+
+ENVIRONMENT:
+
+  SFBANKDIR
+	Search path for sound files.  The current directory is always
+	searched at first.
+	
+
+----------------------------------------------------------------
+* AWESET
+
+AWESET sets many controll parameters on AWE driver.
+Most of the parameters can be controlled directly from drvmidi
+MIDI sequencer.  This program is useful to control the parameters
+for other non-AWE-specific programs.
+
+The control parameters are given either by command line or a file.
+
+	% aweset newvolume on
+	% aweset n 1
+	% aweset -f new-config
+
+In the first case, aweset enables a boolean parameter "newvolume".
+The second case is identical with the first case, but using an
+abbreviated command.
+In the last case, aweset reads a file "new-config" and parses the
+contents.  The file must contain the commands like command line
+arguments as former cases.
+
+The available commands are as follows:
+
+command(abbrev)	data type	description
+
+- exclusive(e)	bool	exclusive note mode (default: on)
+- realpan(p)	bool	real-time panning change (default: on)
+- gusbank(g)	int	GUS-instrument bank number (default: 0)
+- keepeffect(k)	bool	keep effect controls after clearing voices (def:off)
+- zeroatten(z)	int	zero attenuation level (default: 32 - depends on sfxload)
+- chnprior(C)	bool	channel priority mode (default: off)
+- modsense(m)	int	modulation wheel sensitivity (default: 18)
+- defpreset(P)	int	default search preset number (default: 0)
+- defbank(B)	int	default search bank number (default: 0)
+- defdrum(D)	int	default search drumset number (default: 0)
+- toggledrum(a)	bool	accept to change bank of drum channels (def: off)
+- newvolume(n)	bool	Windows/DOS-like volume calculation mode (def: on)
+- chorus(c)	[0-7]	chorus mode (default: 2)
+- reverb(r)	[0-7]	reverb mode (default: 4)
+- bass(b)	[0-11]	equalizer bass level (default: 5)
+- treble(t)	[0-11]	equalizer treble level (default: 9)
+- debug(d)	int	debug mode (default: 0)
+- panexchange(x) bool	exchange panning direction (left<->right) (def:off)
+
+
+----------------------------------------------------------------
+* SETFX
+
+SETFX reads a configuration file and downloads the user defined
+chorus/reverb effect parameters on the sound driver.
+
+	% setfx test.cfg
+
+The format of configuration file is as follows:
+
+	type:mode:name:include:parameters..
+
+	type
+	    this specifies either "chorus" or "reverb".
+	mode
+	    the mode index in integer value from 8 to 31.
+	name
+	    the name of this effect in any string (except colon)
+	include
+	    include from the pre-defined mode.  This is valid only on
+	    reverb definition.  If this index is specified, the
+	    parameter lists become "pos=value pos=value.." where 'pos'
+	    is a position of the parameter (from 0 to 27) and 'value'
+	    is the new replaced value.
+	parameters
+	    effect parameters.  All values are written in hex code.  
+	    In chorus mode, this contains five values, while in reverb
+	    mode, 28 values must be listed.
+
+The configuratoin file is searched according to the pre-defined
+soundfont path search list.
+
+
+----------------------------------------------------------------
+* SF2TEXT
+
+Sf2text converts the specified SoundFont file to the text file which
+is editable easily.  Both SBK and SF2 formats can be converted. 
+
+	% sf2text sample.sf2 sample.txt
+
+The converted text file contains five categories.
+
+1. major and minor versions
+2. sample data position and size
+3. preset information
+4. instrument information
+5. sample data information
+
+The present sf2text program employes an S-expression list.
+This text file can be converted to SoundFont format again via
+text2sf utility program below.
+
+
+----------------------------------------------------------------
+* TEXT2SF
+
+Text2sf works as an opposite convertor from text file to SoundFont
+format file.  It reads an S-expression list and write it on the new
+SoundFont file.
+
+	% text2sf sample.txt sample.sf2 new.sf2
+
+The second argument is the original SoundFont file, and the last
+is the new SoundFont file.  The original file is necessary to
+duplicate INFO list and wave samples to the new file.
+
+
+----------------------------------------------------------------
+* GUSLOAD
+
+Gusload is a tool to load a GUS compatible patch file to AWE32 driver.
+
+	% gusload [-i] [-v] [-b bank] [-p preset] [-k keynote] GUSfile
+
+The voices are loaded as a preset with the prescribed instrument
+number in each patch unless -p option is specified.
+The bank number is also changed by -b option.
+The option -k is used to specify the fixed key note for the patch.
+
+eg)
+	% gusload -b 0 -p 53 doo.pat
+
+The option -i is identical with sfxload.  All the samples will be
+cleared before loading.
+
+
+----------------------------------------------------------------
+* SFXTEST
+
+Sfxtest is a sample program to control awe sound driver.
+
+	% sfxtest commands ...
+
+For example, to play a trumpet voice (preset 56) on key middle C (60)
+for two seconds in channel access mode, execute as follows:
+
+	% sfxtest X p 56 n 60 127 t 200 K 60
+
+You can see the debug message of the awe driver by setting debug
+mode.
+
+	% sfxtest X D 9 p 47 n 62 100 t 150 K 47 D 0
+
+Multiple channels can be used at the same time.
+
+	% sfxtest X x 0 p 0 n 60 127 x 1 p 5 n 72 110 t 150 x 0 K 60 x 1 K 72
+
+
+----------------------------------------------------------------
+* ACKNOWLEDGMENTS
+
+Thanks to Mark Weaver who revealed and offered ADIP compatible
+parameter calculations.
+
+
+----------------------------------------------------------------
+* COPYRIGHT
+
+Copyright (C) 1996-1999 by Takashi Iwai
+
+These programs are free software; you can redistribute them and/or
+modify them under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the
+License, or (at your option) any later version.
+
+These programs are distributed in the hope that they will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.

@@ -1,0 +1,105 @@
+#
+# Sample Makefile for awesfx package (shared library)
+#
+
+INSTDIR = /usr/local
+BINDIR = $(INSTDIR)/bin
+INCDIR = $(INSTDIR)/include/awe
+LIBDIR = $(INSTDIR)/lib
+MANDIR = $(INSTDIR)/man
+
+BANKDIR = $(LIBDIR)/sfbank
+
+CDEBUGFLAGS = -O2
+CINCS = -Iinclude
+# CINCS += -I/usr/src/sys/i386/isa/sound
+CDEFS = -Wall -Dlinux
+
+CFLAGS = $(CDEBUGFLAGS) $(CINCS) $(CDEFS)
+
+INSTBINFLAGS = -c -m 0755
+INSTMANFLAGS = -c -m 0644
+INSTINCFLAGS = -c -m 0444
+INSTBNKFLAGS = -c -m 0644
+
+DEPLIB = awelib/libawe.so
+LINKLIB = -Lawelib -lawe
+MANSUFFIX = 1
+
+RM = rm -f
+LN = ln -sf
+INSTALL = install
+
+################
+
+TARGET = sfxload setfx sf2text text2sf gusload sfxtest aweset
+MANFILES = sfxload.man
+
+all: $(TARGET)
+
+sfxload: sfxload.o seq.o $(DEPLIB)
+	$(CC) -o $@ $^ $(LINKLIB) -lm
+
+setfx: setfx.o seq.o $(DEPLIB)
+	$(CC) -o $@ $^ $(LINKLIB) -lm
+
+sf2text: sf2text.o $(DEPLIB)
+	$(CC) -o $@ $^ $(LINKLIB) -lm
+
+text2sf: text2sf.o $(DEPLIB)
+	$(CC) -o $@ $^ $(LINKLIB) -lm
+
+gusload: gusload.o seq.o
+	$(CC) -o $@ $^ -lm
+
+sfxtest: sfxtest.o seq.o
+	$(CC) -o $@ $^ -lm
+
+aweset: aweset.o seq.o
+	$(CC) -o $@ $^ $(LINKLIB) -lm
+
+install: install.bin install.lib install.man install.samples
+
+install.bin: $(TARGET)
+	@if [ ! -d $(BINDIR) ]; then \
+	mkdir -p $(BINDIR); \
+	fi; \
+	for i in $(TARGET); do \
+	$(INSTALL) $(INSTBINFLAGS) $$i $(BINDIR); \
+	done
+
+install.lib:
+	$(MAKE) -C awelib 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' install
+	@if [ ! -d $(INCDIR) ]; then \
+	mkdir -p $(INCDIR); \
+	fi; \
+	for i in include/*.h; do \
+	$(INSTALL) $(INSTINCFLAGS) $$i $(INCDIR); \
+	done
+
+install.samples:
+	@if [ ! -d $(BANKDIR) ]; then \
+	mkdir -p $(BANKDIR); \
+	fi; \
+	for i in samples/*; do \
+	$(INSTALL) $(INSTBNKFLAGS) $$i $(BANKDIR); \
+	done
+
+install.man: $(MANFILES) $(DEPLIB)
+	@if [ ! -d $(MANDIR)/man$(MANSUFFIX) ]; then \
+	mkdir -p $(MANDIR)/man$(MANSUFFIX); \
+	fi; \
+	for i in $(MANFILES); do\
+	manfile=`echo $$i | sed -e 's/\.man$$/\.$(MANSUFFIX)/g'` ; \
+	$(INSTALL) $(INSTMANFLAGS) $$i $(MANDIR)/man$(MANSUFFIX)/$$manfile ; \
+	done
+	$(MAKE) -C awelib 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' install.man
+
+$(DEPLIB):
+	@echo "making $(DEPLIB) in awelib.."
+	$(MAKE) -C awelib 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' all
+
+clean:
+	$(RM) $(TARGET)
+	$(RM) *.o
+	$(MAKE) -C awelib 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'INSTDIR=$(INSTDIR)' clean

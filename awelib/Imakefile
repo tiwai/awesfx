@@ -1,0 +1,41 @@
+/*
+ * Imakefile for AWElib
+ */
+
+#include "config.h"
+
+LIBVER = 0.4.3
+
+INSTDIR = /usr/local
+
+LIBDIR = $(INSTDIR)/lib
+INCLUDES += -I../include
+
+#ifdef FreeBSDArchitecture
+/* search path of awe_voice.h. */
+INCLUDES += -I/usr/src/sys/i386/isa/sound
+#endif
+
+SHOBJS = awe_parm.o bool.o cmpopen.o dynload.o fskip.o gentxt.o loadbank.o\
+	loadtext.o malloc.o mygetopt.o optfile.o parsesf.o path.o sample.o\
+	sbkconv.o sffile.o sfitem.o sfopts.o sfout.o slist.o dummy.o
+
+#ifdef MAKE_SHARED_LIBRARY
+
+%.o: %.c
+	NormalSharedLibObjCompile()
+SharedLibraryTarget(awe,$(LIBVER), $(SHOBJS), ., .)
+#ifdef INSTALL_AWELIB
+InstallSharedLibrary(awe,$(LIBVER), $(LIBDIR))
+#endif
+
+#else
+
+%.o: %.c
+	NormalLibObjCompile()
+NormalLibraryTarget(awe, $(SHOBJS))
+#ifdef INSTALL_AWELIB
+InstallLibrary(awe, $(LIBDIR))
+#endif
+
+#endif

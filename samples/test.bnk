@@ -1,0 +1,26 @@
+# virtual bank structure
+#
+#	source:map[:soundfont [name]]
+#
+# preset = preset[/bank[/keynote]]
+#
+
+# map music box on preset 0
+10/0:0/0:synthgm DummyPiano
+
+# map piano1 of chaos8m on preset 1
+0/0:1/0:chaos8m Piano2
+# map piano1 of synthgm on preset 2
+0/0:2/0:synthgm Piano3
+
+# use all standard drums in 2mbgmgs.sf2
+0/128:0/128:2mbgmgs Standard
+
+# map standard bass drum as room bass drum in chaos4m.sf2
+0/128/35:8/128/35:chaos4m Test Drum
+
+# include XG sfx mappings
+include xgsfx.bnk
+
+# use synthgs.sbk as default fonts
+default synthgs

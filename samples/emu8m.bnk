@@ -1,0 +1,73 @@
+#
+# Supplementary definitions for 8mbgmsfx.sf2 from Emu
+# (included in AWE64 memory module CD-ROM)
+# Some tones taken from 2mbgmgs.sf2
+#
+
+56/128/49:120/1	Cut Noise
+56/128/50:120/2	String Slap
+56/128/51:121/1	Key Click
+56/128/79:122/1	Rain
+56/128/80:122/2	Thunder
+56/128/81:122/3	Wind
+56/128/83:122/4	Stream
+56/128/84:122/5	Bubble
+56/128/76:123/1	Dog
+56/128/77:123/2	Horse-Gallop
+56/128/90:124/1	Telephone 2
+56/128/59:124/2	Door Creaking
+56/128/60:124/3	Door
+56/128/61:124/4	Scratch
+56/128/62:124/5	Windchime
+56/128/63:125/1	Car-Engine
+56/128/64:125/2	Car-Stop
+56/128/65:125/3	Car-Pass
+56/128/66:125/4	Car-Crash
+56/128/67:125/5	Siren
+56/128/68:125/6	Train
+56/128/69:125/7	Jetplane
+56/128/71:125/8	Starship
+125/9:125/9:2mbgmgs Burst Noise
+56/128/52:126/1	Laughing
+56/128/53:126/2	Screaming
+56/128/54:126/3	Punch
+56/128/55:126/4	Hear Beat
+56/128/56:126/5	Footsteps
+56/128/73:127/1	Machine Gun
+56/128/74:127/2	Laser Gun
+56/128/75:127/3	Explosion
+4/8:4/8:2mbgmgs Detuned Rhodes
+5/8:5/8:2mbgmgs Detuned EP2
+6/8:6/8:2mbgmgs Coupled Harpsichord
+14/8:14/8:2mbgmgs Church Bell
+16/8:16/8:2mbgmgs Detuned Organ 1
+17/8:17/8:2mbgmgs Detuned Organ 2
+19/8:19/8:2mbgmgs Detuned Organ 3
+21/8:21/8:2mbgmgs Italian Accordion
+24/8:24/8:2mbgmgs Ukulele
+25/8:25/8:2mbgmgs 12 St. Guitar
+25/16:25/16:2mbgmgs Mandolin
+26/8:26/8:2mbgmgs Hawaiian Guitar
+27/8:27/8:2mbgmgs Chorus Guitar
+28/8:28/8:2mbgmgs Funk Guitar
+30/8:30/8:2mbgmgs FeedBack Guitar
+31/8:31/8:2mbgmgs Guitar FeedBack
+38/8:38/8:2mbgmgs SynthBass 3
+39/8:39/8:2mbgmgs SynthBass 4
+48/8:48/8:2mbgmgs Orchestra Pad
+50/8:50/8:2mbgmgs Syn Strings 3
+61/8:61/8:2mbgmgs Brass 2
+62/8:62/8:2mbgmgs Synth Brass 3
+63/8:63/8:2mbgmgs Synth Brass 4
+80/8:80/8:2mbgmgs Sine Wave
+107/8:107/8:2mbgmgs Taisho Koto
+115/8:115/8:2mbgmgs Castanets
+116/8:116/8:2mbgmgs Concert BD
+117/8:117/8:2mbgmgs Melo Tom 2
+118/8:118/8:2mbgmgs 808 Tom
+# not enough memory for this..
+# */127:*/127:2mbgmgs MT
+
+include xgmap.bnk
+
+default 8mbgmsfx

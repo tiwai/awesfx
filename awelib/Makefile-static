@@ -1,0 +1,47 @@
+#
+# Sample Makefile for awelib static library
+#
+
+INSTDIR = /usr/local
+LIBDIR = $(INSTDIR)/lib
+
+LIBVER = 0.4.3
+LIBNAME = awe
+
+LIB = lib$(LIBNAME).a
+
+CDEBUGFLAGS = -O2
+CINCS = -I../include
+CDEFS = -Wall -Dlinux
+
+CFLAGS = $(CDEBUGS) $(CINCS) $(CDEFS)
+
+INSTLIBFLAGS = -c -m 0755
+
+OBJS = awe_parm.o bool.o cmpopen.o dynload.o fskip.o gentxt.o loadbank.o\
+	loadtext.o malloc.o mygetopt.o optfile.o parsesf.o path.o sample.o\
+	sbkconv.o sffile.o sfitem.o sfopts.o sfout.o slist.o dummy.o
+
+RM = rm -f
+LN = ln -sf
+INSTALL = install
+
+################
+
+all: $(LIB)
+
+$(LIB): $(OBJS)
+	$(RM) $(LIB)
+	$(AR) clq $(LIB) $(OBJS)
+
+install: $(LIB)
+	@if [ -d $(LIBDIR) ]; then set +x; \
+	else (set -x; mkdir -p $(LIBDIR)); fi
+	$(RM) $(LIBDIR)/$(LIB)
+	$(INSTALL) $(INSTLIBFLAGS) $(LIB) $(LIBDIR)
+
+install.man:
+
+clean:
+	$(RM) $(LIB)
+	$(RM) $(OBJS)

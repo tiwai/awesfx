@@ -1,0 +1,7 @@
+#
+# XG BANK FILE FOR DYNAMIC LOADING
+#
+
+include xgmap.bnk
+include default.bnk
+

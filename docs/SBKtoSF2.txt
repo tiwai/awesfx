@@ -1,0 +1,131 @@
+================================================================
+     SoundFont 1 (sbk) --> SoundFont 2 (sf2) Conversion
+================================================================
+
+The following conversion rules are on the basis of my experience.
+Please do not consult to Creative about this.
+						-- iwai
+
+================================================================
+modenv, volenv, lfo1, lfo2
+delay time	msec
+attack time	msec
+hold time	msec
+decay time	msec
+release time	msec
+--
+sf2		time cents
+	sf2 = log2(sbk/1000) * 1200
+
+================================================================
+vol sustain	0-127 (or larger)
+--
+sf2		cB below full scale
+	sf2 = 1000 - 10.5 * sbk		when sbk < 96
+	sf2 = 0				when sbk >= 96
+  Note: the default sustain level is 1000 in SBK, while 0 in SF2.
+
+================================================================
+mod sustain	0-96 (96 = zero attenuation, 0 = minimum)
+--
+sf2		0.1% below full scale
+	sf2 = 1000 * (96 - val) / 96	when sbk < 96
+	sf2 = 0				when sbk >= 96
+  Note: the default sustain level is 1000 in SBK, while 0 in SF2.
+
+================================================================
+time change per key	??
+--
+sf2		timecent per key
+	sf2 = sbk * 5.55  (??)
+
+================================================================
+pan position	0-127 (just same as MIDI)
+--
+sf2		0.1% (left=0, center=500)
+	sf2 = sbk * 1000 / 127 - 500
+
+================================================================
+init attenuation	0-127 (127 = full scale, 0 = minimum)
+--
+sf2		cB from full scale (see the note below)
+	sf2 = -200 * log10(sbk / 127)
+
+[note:	SF2 spec document says initial attenuation is in unit of
+	centibels, but actual data looks like 2 to 10 times greater.
+	The above conversion does NOT include this correction.]
+
+================================================================
+chorus		0-255
+reverb
+--
+sf2		0.1%
+	sf2 = sbk * 1000 / 255
+
+================================================================
+initFilterFc
+--
+sf2		absolute cents
+	sf2 = 59 * sbk + 4366	when sbk < 127
+	(alternatively, sf2 = 50 * sbk + 4721 (4721=125Hz))
+	sf2 = 14400		when sbk = 127
+
+================================================================
+initFilterQ
+--
+sf2		cB above DC gain
+	sf2 = sbk * 3 / 2
+
+================================================================
+LFO1 freq
+LFO2 freq
+--
+sf2		absolte cents
+	sf2 = 1200 * log10(sbk) / log10(2) - 7925
+
+================================================================
+modenv pitch shift
+LFO1 pitch shift
+LFO2 pitch shift
+--
+sf2		cents
+	sf2 = (1200 * sbk / 64 + 1) / 2
+
+================================================================
+moenv cutoff shift
+LFO1 cutoff shift
+--
+sf2		cents
+	sf2 = (1200 * ratio * sbk) / 64
+		ratio = 6	when modenv
+		ratio = 3	when lfo1
+
+================================================================
+lfo1 tremolo volume
+--
+sf2		cB
+	sf2 = (120 * sbk) / 64
+
+================================================================
+scale tuning	0/1
+--
+sf2		semitone
+	sf2 = 100	when sbk = 0
+	sf2 = 50	when sbk = 1
+  NOTE: scale tuning can overwrite in preset layer to instruments.
+	don't add the "converted" value.  Otherwise, convert
+	after adding the value.
+
+================================================================
+sample pitch (SF1 only; reserved3(#55) in SF2)
+--
+sf2		N/A
+	sf2 rootkey = sbk / 100
+	sf2 finetune = -sbk % 100
+	if finetune <= -50 then
+	  rootkey++
+	  finetune = 100 + finetune
+	endif
+
+================================================================
+

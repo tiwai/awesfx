@@ -1,0 +1,60 @@
+ver.0.4.3c
+	- Add --device and --index options
+	- RPM spec file is included
+
+ver.0.4.3b
+	- Change directory contents
+	- Add sapmles Makefiles for shared-library
+ver.0.4.3a
+	- Minor bug fix
+ver.0.4.3
+	- Official relase
+
+ver.0.4.3p4
+	- Add -i and -N options
+
+ver.0.4.3p3
+	- Load via sample sharing mode (for awedrv-0.4.3p4)
+	- Fix a bug to miss some fonts in dynamic loading
+	- Fix a bug in path.c
+	- Change library version to 0.4.3
+
+ver.0.4.3p2
+	- Fix a bug to garbage purge_list (in parsesf.c)
+	- New program: aweset
+
+ver.0.4.3p1
+	- Change parameter calculation as well as DOS drivers
+	- Add --compat option to keep the compatibility with older versions
+	- Avoid to load a part of layers when out of memory
+
+ver.0.4.2
+	- Add setfx command.
+	- Add lock option.
+	- Support for virtual bank file.
+	- Support for preset mapping
+	- Merge global variables to one option structure.
+	- Change from Makefile to Imakefile
+	- Create AWElib for easy use of patch loading
+	- Fix a getopt bug.
+	- Fix a bug in calculation of envelope hold time
+	- Fix a bug in calculation of coarse loop addresses
+	- Sfxload tells if the file is not found
+	- Add keynote option in gusload
+	- Change sfxtest arguments
+
+ver.0.4.1	development versions
+
+ver.0.4.0
+	TOTALLY REWRITEN.
+	- Remove -i option: always remove samples if not speicifed -b
+	  option.
+	- Remove other obsolte options, -I, -s, -m.
+	  (though they're remained for comaptibility.)
+	- Add attenuation control options, -A and -a.
+	- Add memory display option, -M.
+	- Do not support SFX file in sfxload utility.
+	- Read & write S-expression style text file.
+	- Add partial loading
+	- Use default rc file
+	- Support long options

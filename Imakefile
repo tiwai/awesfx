@@ -1,0 +1,67 @@
+/*
+ * Imakefile for awesfx package
+ */
+
+/*CDEBUGFLAGS=-g*/
+CDEBUGFLAGS=-Wall
+
+#include "awelib/config.h"
+
+#define IHaveSubdirs
+SUBDIRS = awelib include
+
+/* binary and manual directories */
+INSTDIR = /usr/local
+
+BINDIR = $(INSTDIR)/bin
+MANDIR = $(INSTDIR)/man/man1
+MANSUFFIX = 1
+
+#define PassCDebugFlags CDEBUGFLAGS=$(CDEBUGFLAGS) INSTDIR=$(INSTDIR)
+
+/* include directory for awelib */
+INCLUDES += -Iinclude
+
+#ifdef FreeBSDArchitecture
+/* search path of awe_voice.h. */
+INCLUDES += -I/usr/src/sys/i386/isa/sound -I/usr/src/sys/gnu/i386/isa/sound
+#endif
+
+#ifdef MAKE_SHARED_LIBRARY
+DEPLIB = awelib/libawe.so
+#else
+DEPLIB = awelib/libawe.a
+#endif
+
+AWELIB = -Lawelib -lawe
+
+NormalProgramTarget(sfxload, sfxload.o seq.o, $(DEPLIB),  $(AWELIB), -lm)
+AllTarget(sfxload)
+InstallProgram(sfxload, $(BINDIR))
+InstallManPage(sfxload, $(MANDIR))
+
+NormalProgramTarget(setfx, setfx.o seq.o, $(DEPLIB),  $(AWELIB), -lm)
+AllTarget(setfx)
+InstallProgram(setfx, $(BINDIR))
+
+NormalProgramTarget(sf2text, sf2text.o, $(DEPLIB), $(AWELIB), -lm)
+AllTarget(sf2text)
+InstallProgram(sf2text, $(BINDIR))
+
+NormalProgramTarget(text2sf, text2sf.o, $(DEPLIB),  $(AWELIB), -lm)
+AllTarget(text2sf)
+InstallProgram(text2sf, $(BINDIR))
+
+NormalProgramTarget(gusload, gusload.o seq.o,,, -lm)
+AllTarget(gusload)
+InstallProgram(gusload, $(BINDIR))
+
+NormalProgramTarget(sfxtest, sfxtest.o seq.o,,, -lm)
+AllTarget(sfxtest)
+InstallProgram(sfxtest, $(BINDIR))
+
+NormalProgramTarget(aweset, aweset.o seq.o, $(DEPLIB), $(AWELIB), -lm)
+AllTarget(aweset)
+InstallProgram(aweset, $(BINDIR))
+
+NamedMakeSubdirs($(DEPLIB),$(SUBDIRS))
