@@ -1,3 +1,7 @@
+ver.0.4.4
+	- Fixed Makefiles
+	- Fixed big-endian handling
+
 ver.0.4.3c
 	- Add --device and --index options
 	- RPM spec file is included
