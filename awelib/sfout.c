@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include "util.h"
 #include "sffile.h"
+#include "config.h"
 
 #ifndef BUILD_BIG_ENDIAN
 #if defined(ENDIAN) && defined(BIG_ENDIAN)

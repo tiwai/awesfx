@@ -3,7 +3,7 @@
  */
 
 /* make shared library */
-#define MAKE_SHARED_LIBRARY
+/*#define MAKE_SHARED_LIBRARY*/
 
 /* install AWElib */
 #define INSTALL_AWELIB
@@ -22,7 +22,7 @@
 #define RCFILE			".sfxloadrc"
 
 /* big endian machine defines this */
-#undef BUILD_BIG_ENDIAN
+/*#define BUILD_BIG_ENDIAN*/
 #ifdef __powerpc__
 #define BUILD_BIG_ENDIAN
 #endif

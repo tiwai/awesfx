@@ -100,6 +100,48 @@ static FILE *sample_fd;
 static int mem_avail;
 
 
+/*----------------------------------------------------------------
+ * manage instrument counters in hash
+ *----------------------------------------------------------------*/
+
+#define INFO_COUNT_MAPS	64
+
+struct info_count_table {
+	unsigned short instr;
+	unsigned short count;
+	struct info_count_table *next;
+};
+static struct info_count_table *info_count[INFO_COUNT_MAPS];
+
+static void info_write_count_clear(void)
+{
+	int i;
+	struct info_count_table *p;
+	for (i = 0; i < INFO_COUNT_MAPS; i++) {
+		if ((p = info_count[i]) != NULL) {
+			info_count[i] = p->next;
+			safe_free(p);
+		}
+	}
+}
+
+static int info_write_count_inc(unsigned short instr)
+{
+	int key = instr % INFO_COUNT_MAPS;
+	struct info_count_table *val;
+	for (val = info_count[key]; val; val = val->next) {
+		if (val->instr == instr)
+			return ++val->count;
+	}
+	val = safe_malloc(sizeof(*val));
+	val->instr = instr;
+	val->count = 1;
+	val->next = info_count[key];
+	info_count[key] = val;
+	return 1;
+}
+
+
 /*================================================================
  * open / close patch
  *================================================================*/
@@ -138,6 +180,7 @@ int awe_open_font(SFInfo *sf, FILE *fp, int locked)
 	sample_fd = fp;
 	mem_avail = awe_dev;
 	ioctl(seqfd, SNDCTL_SYNTH_MEMAVL, &mem_avail);
+	info_write_count_clear();
 
 	if (awe_option.compatible)
 		atten = awe_option.default_atten;
@@ -542,7 +585,10 @@ static int info_loader(SFInfo *sf, LayerTable *tbl, LoadList *request)
 		vrec.hdr.bank = awe_option.default_bank;
 	vrec.hdr.instr = request->map.preset;
 	vrec.hdr.nvoices = 1;
-	vrec.hdr.write_mode = AWE_WR_APPEND;
+	if (info_write_count_inc(vrec.hdr.instr) == 1)
+		vrec.hdr.write_mode = AWE_WR_REPLACE; /* first time.. */
+	else
+		vrec.hdr.write_mode = AWE_WR_APPEND;
 
 	/* set voice info parameters */
 	set_sample_info(sf, vp, tbl);
