@@ -37,14 +37,27 @@ static void write_pdta(SFInfo *sf, FILE *fin, FILE *fout);
 static void copy_file(int size, FILE *fin, FILE *fout);
 
 
+#ifdef LITTLE_ENDIAN
 #define READCHUNK(var,fd)	fread(&var, 8, 1, fd)
-
 #define WRITECHUNK(var,fd)	fwrite(&var, 8, 1, fd)
-#define WRITEID(str,fd)		fwrite(str, 4, 1, fd)
-#define WRITESTR(str,fd)	fwrite(str, 20, 1, fd)
-#define WRITEB(var,fd)		fwrite(&var, 1, 1, fd)
 #define WRITEW(var,fd)		fwrite(&var, 2, 1, fd)
 #define WRITEDW(var,fd)		fwrite(&var, 4, 1, fd)
+#else
+#define XCHG_SHORT(x) ((((x)&0xFF)<<8) | (((x)>>8)&0xFF))
+#define XCHG_LONG(x) ((((x)&0xFF)<<24) | \
+		      (((x)&0xFF00)<<8) | \
+		      (((x)&0xFF0000)>>8) | \
+		      (((x)>>24)&0xFF))
+#define READCHUNK(var,fd)	{uint32 tmp; fread(&(var).id, 4, 1, fd);\
+	fread(&tmp, 4, 1, fd); (var).size = XCHG_LONG(tmp);}
+#define WRITECHUNK(var,fd)	{uint32 size; fwrite(&(var).id, 4, 1, fd);\
+	tmp = XCHG_LONG((uint32)(var).size); fwrite(&tmp, 8, 1, fd);}
+#define WRITEW(var,fd)		{uint16 tmp = XCHG_SHORT((uint16)(var)); fwrite(&tmp, 2, 1, fd);}
+#define WRITEDW(var,fd)		{uint32 tmp = XCHG_LONG((uint32)(var)); fwrite(&tmp, 4, 1, fd);}
+#endif
+#define WRITEB(var,fd)		fwrite(&var, 1, 1, fd)
+#define WRITEID(str,fd)		fwrite(str, 4, 1, fd)
+#define WRITESTR(str,fd)	fwrite(str, 20, 1, fd)
 
 
 /*----------------------------------------------------------------

@@ -49,8 +49,18 @@ static SFBags prbags, inbags;
 #define READCHUNK(var,fd)	fread(&var, 8, 1, fd)
 #define READID(var,fd)	fread(var, 4, 1, fd)
 #define READSTR(var,fd)	fread(var, 20, 1, fd)
+#ifdef LITTLE_ENDIAN
 #define READDW(var,fd)	fread(&var, 4, 1, fd)
 #define READW(var,fd)	fread(&var, 2, 1, fd)
+#else
+#define XCHG_SHORT(x) ((((x)&0xFF)<<8) | (((x)>>8)&0xFF))
+#define XCHG_LONG(x) ((((x)&0xFF)<<24) | \
+		      (((x)&0xFF00)<<8) | \
+		      (((x)&0xFF0000)>>8) | \
+		      (((x)>>24)&0xFF))
+#define READDW(var,fd)	{uint32 tmp; fread(&tmp, 4, 1, fd); (var) = XCHG_LONG(tmp);}
+#define READW(var,fd)	{uint16 tmp; fread(&tmp, 2, 1, fd); (var) = XCHG_SHORT(tmp);}
+#endif
 #define READB(var,fd)	fread(&var, 1, 1, fd)
 #define SKIPB(fd)	{char dummy; fread(&dummy, 1, 1, fd);}
 #define SKIPW(fd)	{short dummy; fread(&dummy, 2, 1, fd);}
