@@ -82,7 +82,7 @@ static struct option long_options[] = {
 	{0,0,0,0},
 };
 
-#define OPTIONS "hvf:d:D:"
+#define OPTIONS "hvf:F:D:"
 static int file_passed = 0;
 
 int main(int argc, char **argv)
