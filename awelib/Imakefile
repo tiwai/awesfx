@@ -16,6 +16,11 @@ INCLUDES += -I../include
 INCLUDES += -I/usr/src/sys/i386/isa/sound
 #endif
 
+/* big endian */
+#ifdef BUILD_BIG_ENDIAN
+DEFINES += -DBUILD_BIG_ENDIAN=1
+#endif
+
 SHOBJS = awe_parm.o bool.o cmpopen.o dynload.o fskip.o gentxt.o loadbank.o\
 	loadtext.o malloc.o mygetopt.o optfile.o parsesf.o path.o sample.o\
 	sbkconv.o sffile.o sfitem.o sfopts.o sfout.o slist.o dummy.o

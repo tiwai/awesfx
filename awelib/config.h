@@ -21,3 +21,8 @@
 #define SYSTEM_RCFILE		"/etc/sfxloadrc"
 #define RCFILE			".sfxloadrc"
 
+/* big endian machine defines this */
+#undef BUILD_BIG_ENDIAN
+#ifdef __powerpc__
+#define BUILD_BIG_ENDIAN
+#endif

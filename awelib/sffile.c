@@ -25,6 +25,13 @@
 #include "sffile.h"
 #include "util.h"
 
+#ifndef BUILD_BIG_ENDIAN
+#if defined(ENDIAN) and defined(BIG_ENDIAN)
+#ifdef ENDIAN==BIG_ENDIAN
+#define BUILD_BIG_ENDIAN
+#endif
+#endif
+#endif
 
 /*================================================================
  * preset / instrument bag record
@@ -46,18 +53,20 @@ static SFBags prbags, inbags;
 
 #define NEW(type,nums)	(type*)safe_malloc(sizeof(type) * (nums))
 
-#define READCHUNK(var,fd)	fread(&var, 8, 1, fd)
 #define READID(var,fd)	fread(var, 4, 1, fd)
 #define READSTR(var,fd)	fread(var, 20, 1, fd)
-#ifdef LITTLE_ENDIAN
+#ifndef BUILD_BIG_ENDIAN
+#define READCHUNK(var,fd)	fread(&var, 8, 1, fd)
 #define READDW(var,fd)	fread(&var, 4, 1, fd)
 #define READW(var,fd)	fread(&var, 2, 1, fd)
-#else
+#else /* BIG_ENDIAN */
 #define XCHG_SHORT(x) ((((x)&0xFF)<<8) | (((x)>>8)&0xFF))
 #define XCHG_LONG(x) ((((x)&0xFF)<<24) | \
 		      (((x)&0xFF00)<<8) | \
 		      (((x)&0xFF0000)>>8) | \
 		      (((x)>>24)&0xFF))
+#define READCHUNK(var,fd)	{uint32 tmp; fread((var).id, 4, 1, fd);\
+	fread(&tmp, 4, 1, fd); (var).size = XCHG_LONG(tmp);}
 #define READDW(var,fd)	{uint32 tmp; fread(&tmp, 4, 1, fd); (var) = XCHG_LONG(tmp);}
 #define READW(var,fd)	{uint16 tmp; fread(&tmp, 2, 1, fd); (var) = XCHG_SHORT(tmp);}
 #endif

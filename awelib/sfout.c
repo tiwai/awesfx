@@ -25,6 +25,14 @@
 #include "util.h"
 #include "sffile.h"
 
+#ifndef BUILD_BIG_ENDIAN
+#if defined(ENDIAN) and defined(BIG_ENDIAN)
+#ifdef ENDIAN==BIG_ENDIAN
+#define BUILD_BIG_ENDIAN
+#endif
+#endif
+#endif
+
 /*----------------------------------------------------------------
  * prototypes
  *----------------------------------------------------------------*/
@@ -37,7 +45,7 @@ static void write_pdta(SFInfo *sf, FILE *fin, FILE *fout);
 static void copy_file(int size, FILE *fin, FILE *fout);
 
 
-#ifdef LITTLE_ENDIAN
+#ifndef BUILD_BIG_ENDIAN
 #define READCHUNK(var,fd)	fread(&var, 8, 1, fd)
 #define WRITECHUNK(var,fd)	fwrite(&var, 8, 1, fd)
 #define WRITEW(var,fd)		fwrite(&var, 2, 1, fd)
@@ -48,9 +56,9 @@ static void copy_file(int size, FILE *fin, FILE *fout);
 		      (((x)&0xFF00)<<8) | \
 		      (((x)&0xFF0000)>>8) | \
 		      (((x)>>24)&0xFF))
-#define READCHUNK(var,fd)	{uint32 tmp; fread(&(var).id, 4, 1, fd);\
+#define READCHUNK(var,fd)	{uint32 tmp; fread((var).id, 4, 1, fd);\
 	fread(&tmp, 4, 1, fd); (var).size = XCHG_LONG(tmp);}
-#define WRITECHUNK(var,fd)	{uint32 size; fwrite(&(var).id, 4, 1, fd);\
+#define WRITECHUNK(var,fd)	{uint32 tmp; fwrite((var).id, 4, 1, fd);\
 	tmp = XCHG_LONG((uint32)(var).size); fwrite(&tmp, 8, 1, fd);}
 #define WRITEW(var,fd)		{uint16 tmp = XCHG_SHORT((uint16)(var)); fwrite(&tmp, 2, 1, fd);}
 #define WRITEDW(var,fd)		{uint32 tmp = XCHG_LONG((uint32)(var)); fwrite(&tmp, 4, 1, fd);}

@@ -22,6 +22,11 @@ MANSUFFIX = 1
 /* include directory for awelib */
 INCLUDES += -Iinclude
 
+/* big endian */
+#ifdef BUILD_BIG_ENDIAN
+DEFINES += -DBUILD_BIG_ENDIAN=1
+#endif
+
 #ifdef FreeBSDArchitecture
 /* search path of awe_voice.h. */
 INCLUDES += -I/usr/src/sys/i386/isa/sound -I/usr/src/sys/gnu/i386/isa/sound
