@@ -263,7 +263,7 @@ int awe_get_argument(int argc, char **argv, char *optstr, struct option *args)
 static char *get_fontname(int argc, char **argv)
 {
 	int rc;
-	rc = awe_get_argument(argc, argv, OPTION_FLAGS, long_options);
+	rc = awe_get_argument(argc, argv, OPTION_FLAGS AWE_BASE_OPTIONS, long_options);
 	if (rc < argc)
 		return argv[rc];
 	return NULL;

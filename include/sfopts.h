@@ -46,4 +46,6 @@ void awe_read_option_file(char *fname);
 int awe_parse_options(int argc, char **argv, char *optflags,
 		      struct option *long_opts, int *optidx);
 
+#define AWE_BASE_OPTIONS	"b:c:r:P:A:a:d:V:BC"
+
 #endif

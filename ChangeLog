@@ -1,3 +1,6 @@
+ver.0.5.0c
+	- fixed the option parsing.  -b option works again now.
+
 ver.0.5.0b
 	- patches by N. Vignot
 	  - fixed sf2text outputs for non-printable letters
