@@ -26,12 +26,20 @@
 
 #define SNDRV_EMUX_HWDEP_NAME	"Emux WaveTable"
 
+struct sndrv_emux_misc_mode {
+	int port;	/* -1 = all */
+	int mode;
+	int value;
+	int value2;	/* reserved */
+};
+
 enum {
 	SNDRV_EMUX_IOCTL_VERSION = _IOR('H', 0x80, unsigned int),
 	SNDRV_EMUX_IOCTL_LOAD_PATCH = _IOWR('H', 0x81, awe_patch_info),
 	SNDRV_EMUX_IOCTL_RESET_SAMPLES = _IO('H', 0x82),
 	SNDRV_EMUX_IOCTL_REMOVE_LAST_SAMPLES = _IO('H', 0x83),
 	SNDRV_EMUX_IOCTL_MEM_AVAIL = _IOW('H', 0x84, int),
+	SNDRV_EMUX_IOCTL_MISC_MODE = _IOWR('H', 0x84, struct sndrv_emux_misc_mode),
 };
 
 
@@ -114,4 +122,14 @@ int seq_mem_avail(void)
 	int mem_avail = 0;
 	snd_hwdep_ioctl(hwdep, SNDRV_EMUX_IOCTL_MEM_AVAIL, &mem_avail);
 	return mem_avail;
+}
+
+int seq_zero_atten(int atten)
+{
+	struct sndrv_emux_misc_mode mode;
+	mode.port = -1;
+	mode.mode = AWE_MD_ZERO_ATTEN;
+	mode.value = atten;
+	mode.value2 = 0;
+	return snd_hwdep_ioctl(hwdep, SNDRV_EMUX_IOCTL_MISC_MODE, &mode);
 }

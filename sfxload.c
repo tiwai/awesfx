@@ -51,9 +51,7 @@ static AWEOps load_ops = {
 	seq_mem_avail,
 	seq_reset_samples,
 	seq_remove_samples,
-#ifndef BUILD_ASFXLOAD
 	seq_zero_atten
-#endif
 };
 
 

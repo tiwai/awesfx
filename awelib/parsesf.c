@@ -184,8 +184,7 @@ int awe_open_font(AWEOps *ops, SFInfo *sf, FILE *fp, int locked)
 		atten = awe_option.default_atten;
 	else
 		atten = 0;
-	if (ops->set_zero_atten)
-		ops->set_zero_atten(atten);
+	ops->set_zero_atten(atten);
 
 	init_layer_items(sf);
 	awe_init_marks();
