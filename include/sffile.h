@@ -118,12 +118,12 @@ typedef struct _SFInfo {
  *----------------------------------------------------------------*/
 
 /* sffile.c */
-int load_soundfont(SFInfo *sf, FILE *fp, int is_seekable);
-void free_soundfont(SFInfo *sf);
-void save_soundfont(SFInfo *sf, FILE *fin, FILE *fout);
-void load_textinfo(SFInfo *sf, FILE *fp);
+int awe_load_soundfont(SFInfo *sf, FILE *fp, int is_seekable);
+void awe_free_soundfont(SFInfo *sf);
+void awe_save_soundfont(SFInfo *sf, FILE *fin, FILE *fout);
+void awe_load_textinfo(SFInfo *sf, FILE *fp);
 
 /* sample.c */
-void correct_samples(SFInfo *sf);
+void awe_correct_samples(SFInfo *sf);
 
 #endif

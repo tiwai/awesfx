@@ -31,9 +31,10 @@
 #  include <linux/soundcard.h>
 #  include <linux/awe_voice.h>
 #endif
+#include <getopt.h>
 #include "util.h"
 #include "seq.h"
-#include "version.h"
+#include "awe_version.h"
 
 int verbose = 0;
 
@@ -72,7 +73,7 @@ static void seq_init_chip(void)
  * main routine
  *----------------------------------------------------------------*/
 
-static awe_option_args long_options[] = {
+static struct option long_options[] = {
 	{"help", 0, 0, 'h'},
 	{"verbose", 0, 0, 'v'},
 	{"file", 1, 0, 'f'},
@@ -90,7 +91,7 @@ int main(int argc, char **argv)
 	char *seq_devname = NULL;
 	int seq_devidx = -1;
 
-	while ((c = awe_getopt(argc, argv, OPTIONS, long_options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, OPTIONS, long_options, NULL)) != -1) {
 		switch (c) {
 		case 'F':
 			seq_devname = optarg;

@@ -32,7 +32,7 @@
 #  include <linux/awe_voice.h>
 #endif
 #include "seq.h"
-#include "version.h"
+#include "awe_version.h"
 
 SEQ_USE_EXTBUF();
 

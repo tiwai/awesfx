@@ -1,17 +1,25 @@
-.TH sfxload 1 "January 16, 2000"
+.TH sfxload 1 "January 22, 2003"
 .LO 1
 .SH NAME
-sfxload \- load a SoundFont file on the AWE32 sound driver
+sfxload, asfxload \- load a SoundFont file on the Emux WaveTable
 
 .SH SYNOPSIS
 sfxload [\-options] fontfile
 
+asfxload [\-options] fontfile
+
 .SH DESCRIPTION
 .B sfxload
-is a utility program to transfer the sound wave and
-instruments data in a SoundFont file to the AWE32 sound driver.
-This program is necessary for playing MIDI samples
-via sequencer programs supporting AWE driver.
+and
+.B asfxload
+are utility program sto transfer the sound wave
+and instruments data in a SoundFont file to the AWE32 sound driver,
+or to the Emux WaveTable of ALSA sbawe and emu10k1 drivers.
+This program is necessary for playing MIDI samples via sequencer
+programs supporting AWE driver.  There is no big difference between
+sfxload and asfxload except for that asfxload is for ALSA and sfxload
+is for OSS, respecitvely.  The options to specify devices are
+different between them (see below).
 
 Basically, sfxload behaves as two ways.
 .in +1i
@@ -41,15 +49,19 @@ The file extension .sf2, and .sbk can be abbreviated.
 
 .SH OPTIONS
 .TP
-.B \-F, --device=file
+.B \-F, --device=file (sfxload only)
 Specify the device file to be used.
 Default value is /dev/sequencer.
 .TP
-.B \-D, --index=number
+.B \-D, --index=number (sfxload only)
 Specify the device index of AWE driver.
 Negative number (e.g. -1) means to probe the first AWE device automatically.
 For selecting the other AWE cards, a positive index number must be given here.
 Default value is -1.
+.TP
+.B \-D, --hwdep=name (asfxload only)
+Specify the hwdep name to be used.
+As default, asfxload seeks until any Emux compatible hwdep device is found.
 .TP
 .B \-i, --clear[=bool]
 Remove all samples before loading the fonts.
@@ -262,7 +274,7 @@ at first.
 drvmidi(1)
 
 .SH COPYRIGHT
-Copyright (C) 1996-2000 Takashi Iwai.
+Copyright (C) 1996-2003 Takashi Iwai.
 .P
 The AWE32 driver and utilties are free software; you can redistribute them
 and/or modify them under the terms of the \fIGNU General Public

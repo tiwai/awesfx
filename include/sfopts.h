@@ -21,7 +21,7 @@
 #ifndef SFOPTS_H_DEF
 #define SFOPTS_H_DEF
 
-#include "util.h"
+#include <getopt.h>
 
 /* options */
 typedef struct _sf_options {
@@ -44,6 +44,6 @@ extern sf_options awe_option;
 
 void awe_read_option_file(char *fname);
 int awe_parse_options(int argc, char **argv, char *optflags,
-		      awe_option_args *long_opts, int *optidx);
+		      struct option *long_opts, int *optidx);
 
 #endif

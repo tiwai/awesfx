@@ -48,17 +48,17 @@ typedef struct _VBank {
 } VBank;
 
 static int is_virtual_bank(char *path);
-static int load_virtual_bank(char *path, LoadList *part_list, int locked);
-static int load_patch(char *path, LoadList *lp, LoadList *exlp, int locked, int load_alt);
-static int load_map(LoadList *lp, int locked);
+static int load_virtual_bank(AWEOps *ops, char *path, LoadList *part_list, int locked);
+static int load_patch(AWEOps *ops, char *path, LoadList *lp, LoadList *exlp, int locked, int load_alt);
+static int load_map(AWEOps *ops, LoadList *lp, int locked);
 
 static LoadList *make_virtual_list(VBank *v, LoadList *part_list);
 static void make_bank_table(FILE *fp);
 static void include_bank_table(char *name);
 static void free_bank_table(void);
 
-static int do_load_all_banks(int locked);
-static int do_load_banks(int locked);
+static int do_load_all_banks(AWEOps *ops, int locked);
+static int do_load_banks(AWEOps *ops, int locked);
 static void mark_loaded_presets(LoadList *pat, LoadList *list);
 static LoadList *find_list(LoadList *list, SFPatchRec *pat);
 static int find_matching_map(SFPatchRec *pat, int level);
@@ -86,7 +86,7 @@ static char *search_path;
  * load arbitrary file with specified loading list
  *----------------------------------------------------------------*/
 
-int awe_load_bank(char *name, LoadList *list, int locked)
+int awe_load_bank(AWEOps *ops, char *name, LoadList *list, int locked)
 {
 	int rc;
 	char sfpath[256];
@@ -101,11 +101,11 @@ int awe_load_bank(char *name, LoadList *list, int locked)
 		search_path = safe_strdup(p);
 	}
 
-	if (search_file_name(sfpath, name, search_path, path_ext_all)) {
+	if (awe_search_file_name(sfpath, sizeof(sfpath), name, search_path, path_ext_all)) {
 		if (is_virtual_bank(sfpath))
-			rc = load_virtual_bank(sfpath, list, locked);
+			rc = load_virtual_bank(ops, sfpath, list, locked);
 		else
-			rc = load_patch(name, list, NULL, locked, TRUE);
+			rc = load_patch(ops, name, list, NULL, locked, TRUE);
 	} else
 		rc = AWE_RET_NOT_FOUND;
 
@@ -135,7 +135,7 @@ static int is_virtual_bank(char *path)
 }
 
 /* read a virtual bank config file and load the specified fonts */
-static int load_virtual_bank(char *path, LoadList *part_list, int locked)
+static int load_virtual_bank(AWEOps *ops, char *path, LoadList *part_list, int locked)
 {
 	int rc;
 	FILE *fp;
@@ -147,23 +147,23 @@ static int load_virtual_bank(char *path, LoadList *part_list, int locked)
 	vbanks = NULL;
 	vmap = vmapkey = NULL;
 	default_font = NULL;
-	bank_list = merge_loadlist(NULL, part_list); /* copy the list */
+	bank_list = awe_merge_loadlist(NULL, part_list); /* copy the list */
 	excl_list = NULL;
 
 	make_bank_table(fp);
 	fclose(fp);
 
 	if (bank_list)
-		rc = do_load_banks(locked);  /* loading partial fonts */
+		rc = do_load_banks(ops, locked);  /* loading partial fonts */
 	else
-		rc = do_load_all_banks(locked); /* loading all fonts */
+		rc = do_load_all_banks(ops, locked); /* loading all fonts */
 
 	if (default_font)
 		free(default_font);
 	if (bank_list)
-		free_loadlist(bank_list);
+		awe_free_loadlist(bank_list);
 	if (excl_list)
-		free_loadlist(excl_list);
+		awe_free_loadlist(excl_list);
 
 	free_bank_table();
 
@@ -171,7 +171,7 @@ static int load_virtual_bank(char *path, LoadList *part_list, int locked)
 }
 		
 /* load the whole virtual banks */
-static int do_load_all_banks(int locked)
+static int do_load_all_banks(AWEOps *ops, int locked)
 {
 	int rc;
 	VBank *v;
@@ -179,18 +179,18 @@ static int do_load_all_banks(int locked)
 	if (vmap || vmapkey) {
 		/* load preset mapping to the driver */
 		if (vmap) {
-			rc = load_map(vmap->list, locked);
+			rc = load_map(ops, vmap->list, locked);
 			if (rc == AWE_RET_ERR || rc == AWE_RET_NOMEM)
 				return rc;
 			/* add the loaded presets to exclusive list */
-			excl_list = merge_loadlist(excl_list, vmap->list);
+			excl_list = awe_merge_loadlist(excl_list, vmap->list);
 		}
 		if (vmapkey) {
-			rc = load_map(vmapkey->list, locked);
+			rc = load_map(ops, vmapkey->list, locked);
 			if (rc == AWE_RET_ERR || rc == AWE_RET_NOMEM)
 				return rc;
 			/* add the loaded presets to exclusive list */
-			excl_list = merge_loadlist(excl_list, vmapkey->list);
+			excl_list = awe_merge_loadlist(excl_list, vmapkey->list);
 		}
 	}
 
@@ -199,22 +199,22 @@ static int do_load_all_banks(int locked)
 		if (v->list == NULL)
 			continue;
 		/* append the defined instruments to exclusive list */
-		excl_list = merge_loadlist(excl_list, v->list);
+		excl_list = awe_merge_loadlist(excl_list, v->list);
 		/* load this file */
-		rc = load_patch(v->name, v->list, NULL, locked, FALSE);
+		rc = load_patch(ops, v->name, v->list, NULL, locked, FALSE);
 		if (rc == AWE_RET_ERR && rc == AWE_RET_NOMEM)
 			return rc;
 	}
 
 	if (default_font)
 		/* load all the fonts except for pre-loaded fonts */
-		return load_patch(default_font, NULL, excl_list, locked, TRUE);
+		return load_patch(ops, default_font, NULL, excl_list, locked, TRUE);
 
 	return AWE_RET_OK;
 }
 
 /* load banks by dynamic loading */
-static int do_load_banks(int locked)
+static int do_load_banks(AWEOps *ops, int locked)
 {
 	int rc;
 	LoadList *vlist, *p;
@@ -222,12 +222,12 @@ static int do_load_banks(int locked)
 
 	/* load preset mapping if any.. */
 	if (vmap) {
-		rc = load_map(vmap->list, locked);
+		rc = load_map(ops, vmap->list, locked);
 		if (rc == AWE_RET_ERR || rc == AWE_RET_NOMEM)
 			return rc;
 	}
 	if (vmapkey) {
-		rc = load_map(vmapkey->list, locked);
+		rc = load_map(ops, vmapkey->list, locked);
 		if (rc == AWE_RET_ERR || rc == AWE_RET_NOMEM)
 			return rc;
 	}
@@ -246,8 +246,8 @@ static int do_load_banks(int locked)
 		if (vlist == NULL)
 			continue;
 
-		rc = load_patch(v->name, vlist, NULL, locked, TRUE);
-		free_loadlist(vlist);
+		rc = load_patch(ops, v->name, vlist, NULL, locked, TRUE);
+		awe_free_loadlist(vlist);
 		if (rc == AWE_RET_ERR && rc == AWE_RET_NOMEM)
 			return rc;
 
@@ -261,15 +261,15 @@ static int do_load_banks(int locked)
 		vlist = NULL;
 		for (p = bank_list; p; p = p->next) {
 			if (!p->loaded)
-				vlist = add_loadlist(vlist, &p->pat, &p->map);
+				vlist = awe_add_loadlist(vlist, &p->pat, &p->map);
 		}
 			
 		if (vlist == NULL) /* all fonts have been loaded */
 			return AWE_RET_OK;
 
 		/* load them */
-		rc = load_patch(default_font, vlist, NULL, locked, TRUE);
-		free_loadlist(vlist);
+		rc = load_patch(ops, default_font, vlist, NULL, locked, TRUE);
+		awe_free_loadlist(vlist);
 
 		return rc;
 	}
@@ -322,7 +322,7 @@ static int find_matching_in_list(SFPatchRec *pat, LoadList *vlist, int level)
 			tmp = p->pat;
 			if (tmp.keynote == -1)
 				tmp.keynote = pat->keynote;
-			bank_list = curp = add_loadlist(bank_list, &tmp, NULL);
+			bank_list = curp = awe_add_loadlist(bank_list, &tmp, NULL);
 			if (find_matching_map(&curp->map, level+1))
 				curp->loaded = TRUE;
 			return TRUE;
@@ -368,7 +368,7 @@ static LoadList *make_virtual_list(VBank *v, LoadList *part_list)
 				SFPatchRec src, map;
 				awe_merge_keys(&q->pat, &p->pat, &src);
 				awe_merge_keys(&q->map, &p->map, &map);
-				list = add_loadlist(list, &src, &map);
+				list = awe_add_loadlist(list, &src, &map);
 			}
 		}
 	}
@@ -467,7 +467,7 @@ static void make_bank_table(FILE *fp)
 		}
 
 		/* append the current record */
-		v->list = add_loadlist(v->list, &pat, &map);
+		v->list = awe_add_loadlist(v->list, &pat, &map);
 	}
 }
 
@@ -477,7 +477,7 @@ static void include_bank_table(char *name)
 {
 	char path[256];
 	FILE *fp;
-	if (search_file_name(path, name, search_path, path_ext_bank) &&
+	if (awe_search_file_name(path, sizeof(path), name, search_path, path_ext_bank) &&
 	    (fp = fopen(path, "r")) != NULL) {
 		make_bank_table(fp);
 		fclose(fp);
@@ -495,18 +495,18 @@ static void free_bank_table(void)
 		next = v->next;
 		if (v->name)
 			safe_free(v->name);
-		free_loadlist(v->list);
+		awe_free_loadlist(v->list);
 		safe_free(v);
 	}
 	vbanks = NULL;
 	if (vmap) {
 		/* this has no name */
-		free_loadlist(vmap->list);
+		awe_free_loadlist(vmap->list);
 		safe_free(vmap);
 	}
 	if (vmapkey) {
 		/* this has no name */
-		free_loadlist(vmapkey->list);
+		awe_free_loadlist(vmapkey->list);
 		safe_free(vmapkey);
 	}
 }
@@ -522,14 +522,14 @@ static void free_bank_table(void)
  * load_alt = load altenatives for missing fonts
  *----------------------------------------------------------------*/
 
-static int load_patch(char *name, LoadList *lp, LoadList *exlp, int locked, int load_alt)
+static int load_patch(AWEOps *ops, char *name, LoadList *lp, LoadList *exlp, int locked, int load_alt)
 {
 	FILE *fd;
 	char path[256];
 	int rc;
 	static SFInfo sfinfo;
 
-	if (! search_file_name(path, name, search_path, path_ext)) {
+	if (! awe_search_file_name(path, sizeof(path), name, search_path, path_ext)) {
 		fprintf(stderr, "awe: can't find font file %s\n", name);
 		return AWE_RET_SKIP;
 	}
@@ -537,21 +537,21 @@ static int load_patch(char *name, LoadList *lp, LoadList *exlp, int locked, int 
 		fprintf(stderr, "awe: can't open SoundFont file %s\n", path);
 		return AWE_RET_SKIP;
 	}
-	if (load_soundfont(&sfinfo, fd, TRUE) < 0) {
+	if (awe_load_soundfont(&sfinfo, fd, TRUE) < 0) {
 		fprintf(stderr, "awe: can't load SoundFont %s\n", path);
 		return AWE_RET_SKIP;
 	}
-	correct_samples(&sfinfo);
+	awe_correct_samples(&sfinfo);
 
-	awe_open_font(&sfinfo, fd, locked);
+	awe_open_font(ops, &sfinfo, fd, locked);
 	/*rc = awe_load_font_buffered(&sfinfo, lp, exlp, load_alt);*/
 	if (lp)
-		rc = awe_load_font_list(&sfinfo, lp, load_alt);
+		rc = awe_load_font_list(ops, &sfinfo, lp, load_alt);
 	else
-		rc = awe_load_all_fonts(&sfinfo, exlp);
+		rc = awe_load_all_fonts(ops, &sfinfo, exlp);
 
-	awe_close_font(&sfinfo);
-	free_soundfont(&sfinfo);
+	awe_close_font(ops, &sfinfo);
+	awe_free_soundfont(&sfinfo);
 	if (fd)
 		fclose(fd);
 
@@ -563,20 +563,20 @@ static int load_patch(char *name, LoadList *lp, LoadList *exlp, int locked, int 
  * load preset links
  *----------------------------------------------------------------*/
 
-static int load_map(LoadList *lp, int locked)
+static int load_map(AWEOps *ops, LoadList *lp, int locked)
 {
 	int rc;
-	if (awe_open_patch("*MAP*", AWE_PAT_TYPE_MAP, locked) < 0) {
+	if (awe_open_patch(ops, "*MAP*", AWE_PAT_TYPE_MAP, locked) < 0) {
 		fprintf(stderr, "awe: can't access to sequencer\n");
 		return AWE_RET_SKIP;
 	}
 
 	for (; lp; lp = lp->next) {
-		if ((rc = awe_load_map(lp)) != AWE_RET_OK)
+		if ((rc = awe_load_map(ops, lp)) != AWE_RET_OK)
 			return rc;
 		lp->loaded = TRUE;
 	}
-	awe_close_patch();
+	awe_close_patch(ops);
 	return AWE_RET_OK;
 }
 

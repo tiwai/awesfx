@@ -1,0 +1,31 @@
+AC_INIT([awesfx],[0.5.0],[tiwai@suse.de],[awesfx])
+AM_INIT_AUTOMAKE([gnu dist-bzip2])
+AC_CONFIG_SRCDIR([asfxload.c])
+AM_CONFIG_HEADER([include/config.h])
+
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_HEADER_STDC
+AC_C_BIGENDIAN
+AM_PROG_LIBTOOL
+
+AM_PATH_ALSA(1.0.0)
+
+AC_ARG_WITH(default-volume,
+  [  --with-default-volume=percent  Default volume (in percent)],
+  DEFAULT_VOLUME="$withval", DEFAULT_VOLUME=70)
+AC_DEFINE_UNQUOTED(DEFAULT_VOLUME, $DEFAULT_VOLUME, [default volume (in percent)])
+
+AC_ARG_WITH(default-atten,
+  [  --with-default-atten=percent   Default attenuation sense],
+  DEF_ATTEN_SENSE="$withval", DEF_ATTEN_SENSE=10)
+AC_DEFINE_UNQUOTED(DEF_ATTEN_SENSE, $DEF_ATTEN_SENSE, [default attenuation sense (-a)])
+
+AC_ARG_WITH(sfpath,
+  [  --with-sfpath=path(s)          Default SoundFont path],
+  DEFAULT_SF_PATH="$withval",
+  DEFAULT_SF_PATH="/usr/share/sounds/sf2:/usr/share/sfbank:/usr/local/lib/sfbank")
+AC_DEFINE_UNQUOTED(DEFAULT_SF_PATH, "$DEFAULT_SF_PATH", [default SoundFont path])
+
+AC_OUTPUT([Makefile awelib/Makefile include/Makefile samples/Makefile include/awe_version.h])
+

@@ -50,17 +50,16 @@
 #define P_GLOBAL	1
 #define P_LAYER		2
 
-typedef int (*Loader)(SFInfo *sf, LayerTable *tbl, LoadList *request);
+typedef int (*Loader)(AWEOps *ops, SFInfo *sf, LayerTable *tbl, LoadList *request);
 
 static int awe_make_unique_name(char *given, FILE *fp, char *dst);
 
-static int load_patch(void *patch, int len);
-static int probe_sample(int sample_id);
-static int load_matched_font(SFInfo *sf, LoadList *request);
-static int load_samples(SFInfo *sf, int layer, LoadList *request, LoadList *exlist);
-static int sample_loader(SFInfo *sf, LayerTable *tbl, LoadList *request);
-static int load_infos(SFInfo *sf, int layer, LoadList *request, LoadList *exlist);
-static int info_loader(SFInfo *sf, LayerTable *tbl, LoadList *request);
+static int probe_sample(AWEOps *ops, int sample_id);
+static int load_matched_font(AWEOps *ops, SFInfo *sf, LoadList *request);
+static int load_samples(AWEOps *ops, SFInfo *sf, int layer, LoadList *request, LoadList *exlist);
+static int sample_loader(AWEOps *ops, SFInfo *sf, LayerTable *tbl, LoadList *request);
+static int load_infos(AWEOps *ops, SFInfo *sf, int layer, LoadList *request, LoadList *exlist);
+static int info_loader(AWEOps *ops, SFInfo *sf, LayerTable *tbl, LoadList *request);
 static void set_sample_info(SFInfo *sf, awe_voice_info *vp, LayerTable *tbl);
 static void set_init_info(SFInfo *sf, awe_voice_info *vp, LayerTable *tbl);
 static void set_rootkey(SFInfo *sf, awe_voice_info *vp, LayerTable *tbl);
@@ -68,11 +67,11 @@ static void set_modenv(SFInfo *sf, awe_voice_info *vp, LayerTable *tbl);
 static void set_volenv(SFInfo *sf, awe_voice_info *vp, LayerTable *tbl);
 static void set_lfo1(SFInfo *sf, awe_voice_info *vp, LayerTable *tbl);
 static void set_lfo2(SFInfo *sf, awe_voice_info *vp, LayerTable *tbl);
-static int parse_preset_layers(SFInfo *sf, SFPresetHdr *preset,
+static int parse_preset_layers(AWEOps *ops, SFInfo *sf, SFPresetHdr *preset,
 			       LoadList *request, LoadList *exlist,
 			       Loader loader);
 static void search_def_drum_inst(SFInfo *sf);
-static int parse_inst_layers(SFInfo *sf, LayerTable *tbl, LoadList *request,
+static int parse_inst_layers(AWEOps *ops, SFInfo *sf, LayerTable *tbl, LoadList *request,
 			     LoadList *exlist, Loader loader, int level);
 static int find_inst(SFGenLayer *layer);
 static int is_global(SFGenLayer *layer);
@@ -146,7 +145,7 @@ static int info_write_count_inc(unsigned short instr)
  * open / close patch
  *================================================================*/
 
-static int open_patch_priv(char *name, int type, int locked, int shared)
+static int open_patch_priv(AWEOps *ops, char *name, int type, int locked, int shared)
 {
 	struct open_patch_rec {
 		awe_patch_info head;
@@ -161,35 +160,32 @@ static int open_patch_priv(char *name, int type, int locked, int shared)
 	if (shared)
 		rec.parm.type |= AWE_PAT_SHARED;
 	memcpy(rec.parm.name, name, AWE_PATCH_NAME_LEN);
-	return load_patch(&rec, sizeof(rec));
+	return ops->load_patch(&rec, sizeof(rec));
 }
 
-int awe_open_patch(char *name, int type, int locked)
+int awe_open_patch(AWEOps *ops, char *name, int type, int locked)
 {
 	char tmpname[AWE_PATCH_NAME_LEN];
 	strncpy(tmpname, name, AWE_PATCH_NAME_LEN);
-	return open_patch_priv(tmpname, type, locked, FALSE);
+	return open_patch_priv(ops, tmpname, type, locked, FALSE);
 }
 
-int awe_open_font(SFInfo *sf, FILE *fp, int locked)
+int awe_open_font(AWEOps *ops, SFInfo *sf, FILE *fp, int locked)
 {
 	unsigned char uname[AWE_PATCH_NAME_LEN];
 	int atten;
 
 	def_drum_inst = -1;
 	sample_fd = fp;
-	mem_avail = awe_dev;
-	ioctl(seqfd, SNDCTL_SYNTH_MEMAVL, &mem_avail);
+	mem_avail = ops->mem_avail();
 	info_write_count_clear();
 
 	if (awe_option.compatible)
 		atten = awe_option.default_atten;
 	else
 		atten = 0;
-	/* set zero attenuation level; this doesn't use seqbuf */
-	/* flag 0x40 is the ossseq global flag */
-	_AWE_CMD_NOW(seqfd, awe_dev, 0, _AWE_MISC_MODE|0x40,
-		     AWE_MD_ZERO_ATTEN, atten);
+	if (ops->set_zero_atten)
+		ops->set_zero_atten(atten);
 
 	init_layer_items(sf);
 	awe_init_marks();
@@ -197,7 +193,7 @@ int awe_open_font(SFInfo *sf, FILE *fp, int locked)
 	if (awe_make_unique_name(sf->sf_name, fp, uname) != AWE_RET_OK)
 		return -1;
 
-	return open_patch_priv(uname, AWE_PAT_TYPE_GS, locked, TRUE);
+	return open_patch_priv(ops, uname, AWE_PAT_TYPE_GS, locked, TRUE);
 }
 
 /* create a unique name from the given name and file date/size
@@ -238,22 +234,22 @@ static int awe_make_unique_name(char *given, FILE *fp, char *dst)
 }
 
 
-int awe_close_patch(void)
+int awe_close_patch(AWEOps *ops)
 {
 	awe_patch_info head;
 
 	head.key = AWE_PATCH;
 	head.type = AWE_CLOSE_PATCH;
 	head.len = 0;
-	return load_patch(&head, sizeof(head));
+	return ops->load_patch(&head, sizeof(head));
 }
 
-void awe_close_font(SFInfo *sf)
+void awe_close_font(AWEOps *ops, SFInfo *sf)
 {
 	def_drum_inst = -1;
 	sample_fd = NULL;
 	awe_free_marks();
-	awe_close_patch();
+	awe_close_patch(ops);
 }
 
 
@@ -270,32 +266,18 @@ int awe_is_ram_fonts(SFInfo *sf)
 }
 
 /*----------------------------------------------------------------
- * load a patch data
- *----------------------------------------------------------------*/
-
-static int load_patch(void *patch, int len)
-{
-	awe_patch_info *p;
-	p = (awe_patch_info*)patch;
-	p->key = AWE_PATCH;
-	p->device_no = awe_dev;
-	p->sf_id = 0;
-	return write(seqfd, patch, len);
-}
-
-/*----------------------------------------------------------------
  * check if the sample is loade on driver
  * -- using the new feature of awedrv-0.4.3p4
  *----------------------------------------------------------------*/
 
-static int probe_sample(int sample_id)
+static int probe_sample(AWEOps *ops, int sample_id)
 {
 #ifdef AWE_PROBE_DATA
 	awe_patch_info patch;
 	patch.type = AWE_PROBE_DATA;
 	patch.len = 0;
 	patch.optarg = sample_id;
-	if (load_patch(&patch, sizeof(patch)) >= 0)
+	if (ops->load_patch(&patch, sizeof(patch)) >= 0)
 		return TRUE;
 #endif
 	return FALSE;
@@ -305,7 +287,7 @@ static int probe_sample(int sample_id)
  * load a preset link
  *================================================================*/
 
-int awe_load_map(LoadList *lp)
+int awe_load_map(AWEOps *ops, LoadList *lp)
 {
 	struct open_patch_rec {
 		awe_patch_info head;
@@ -320,7 +302,7 @@ int awe_load_map(LoadList *lp)
 	rec.parm.map_bank = lp->map.bank;
 	rec.parm.map_instr = lp->map.preset;
 	rec.parm.map_key = lp->map.keynote;
-	if (load_patch(&rec, sizeof(rec)) == -1) {
+	if (ops->load_patch(&rec, sizeof(rec)) < 0) {
 		if (awe_verbose)
 			fprintf(stderr, "awe: can't load preset mapping\n");
 		return AWE_RET_ERR;
@@ -336,7 +318,7 @@ int awe_load_map(LoadList *lp)
  * load_alt = true if loading alternatives for missing fonts
  *================================================================*/
 
-int awe_load_font_list(SFInfo *sf, LoadList *plist, int load_alt)
+int awe_load_font_list(AWEOps *ops, SFInfo *sf, LoadList *plist, int load_alt)
 {
 	int rc;
 	LoadList *p;
@@ -344,7 +326,7 @@ int awe_load_font_list(SFInfo *sf, LoadList *plist, int load_alt)
 	for (p = plist; p; p = p->next) {
 		if (p->loaded)
 			continue;
-		if ((rc = load_matched_font(sf, p)) == AWE_RET_OK)
+		if ((rc = load_matched_font(ops, sf, p)) == AWE_RET_OK)
 			p->loaded = TRUE;
 		else if (rc == AWE_RET_ERR || rc == AWE_RET_NOMEM)
 			return rc;
@@ -359,11 +341,11 @@ int awe_load_font_list(SFInfo *sf, LoadList *plist, int load_alt)
 			if (p->pat.bank == 128) {
 				if (p->pat.preset != 0) {
 					p->pat.preset = 0;
-					rc = load_matched_font(sf, p);
+					rc = load_matched_font(ops, sf, p);
 				}
 			} else if (p->pat.bank != 0) {
 				p->pat.bank = 0;
-				rc = load_matched_font(sf, p);
+				rc = load_matched_font(ops, sf, p);
 			}
 			if (rc == AWE_RET_OK)
 				p->loaded = TRUE;
@@ -376,7 +358,7 @@ int awe_load_font_list(SFInfo *sf, LoadList *plist, int load_alt)
 }
 
 /* search preset list and find the mathing layer */
-static int load_matched_font(SFInfo *sf, LoadList *request)
+static int load_matched_font(AWEOps *ops, SFInfo *sf, LoadList *request)
 {
 	int i, rc;
 	int found = 0;
@@ -396,12 +378,12 @@ static int load_matched_font(SFInfo *sf, LoadList *request)
 			req.pat.bank = sf->preset[i].bank;
 		/* remap the destination preset */
 		awe_merge_keys(&request->map, &req.pat, &req.map);
-		rc = load_samples(sf, i, &req, NULL);
+		rc = load_samples(ops, sf, i, &req, NULL);
 		if (rc == AWE_RET_ERR || rc == AWE_RET_NOMEM)
 			return rc;
 		else if (rc == AWE_RET_SKIP)
 			continue;
-		rc = load_infos(sf, i, &req, NULL);
+		rc = load_infos(ops, sf, i, &req, NULL);
 		if (rc == AWE_RET_ERR || rc == AWE_RET_NOMEM)
 			return rc;
 		found++;
@@ -419,7 +401,7 @@ static int load_matched_font(SFInfo *sf, LoadList *request)
  * exlist = fonts to be excluded (only map is referred)
  *================================================================*/
 
-int awe_load_all_fonts(SFInfo *sf, LoadList *exlist)
+int awe_load_all_fonts(AWEOps *ops, SFInfo *sf, LoadList *exlist)
 {
 	int rc, i;
 	LoadList *p;
@@ -437,10 +419,10 @@ int awe_load_all_fonts(SFInfo *sf, LoadList *exlist)
 		}
 		req.map = req.pat;
 		req.loaded = FALSE;
-		rc = load_samples(sf, i, &req, exlist);
+		rc = load_samples(ops, sf, i, &req, exlist);
 		if (rc == AWE_RET_NOMEM || rc == AWE_RET_ERR)
 			return rc;
-		rc = load_infos(sf, i, &req, exlist);
+		rc = load_infos(ops, sf, i, &req, exlist);
 		if (rc == AWE_RET_NOMEM || rc == AWE_RET_ERR)
 			return rc;
 	}
@@ -454,14 +436,14 @@ int awe_load_all_fonts(SFInfo *sf, LoadList *exlist)
  *================================================================*/
 
 /* load each preset */
-int awe_load_font(SFInfo *sf, SFPatchRec *pat, SFPatchRec *map)
+int awe_load_font(AWEOps *ops, SFInfo *sf, SFPatchRec *pat, SFPatchRec *map)
 {
 	int rc;
 	LoadList *plist = NULL;
 
-	plist = add_loadlist(plist, pat, map);
-	rc = awe_load_font_list(sf, plist, FALSE);
-	free_loadlist(plist);
+	plist = awe_add_loadlist(plist, pat, map);
+	rc = awe_load_font_list(ops, sf, plist, FALSE);
+	awe_free_loadlist(plist);
 
 	return rc;
 }
@@ -471,9 +453,9 @@ int awe_load_font(SFInfo *sf, SFPatchRec *pat, SFPatchRec *map)
  * load sample data
  *================================================================*/
 
-static int load_samples(SFInfo *sf, int layer, LoadList *request, LoadList *exlist)
+static int load_samples(AWEOps *ops, SFInfo *sf, int layer, LoadList *request, LoadList *exlist)
 {
-	return parse_preset_layers(sf, &sf->preset[layer], request, exlist,
+	return parse_preset_layers(ops, sf, &sf->preset[layer], request, exlist,
 				   sample_loader);
 }
 
@@ -485,7 +467,7 @@ typedef struct patch_rec {
 	unsigned short data[1];
 } patch_rec;
 
-static int sample_loader(SFInfo *sf, LayerTable *tbl, LoadList *request)
+static int sample_loader(AWEOps *ops, SFInfo *sf, LayerTable *tbl, LoadList *request)
 {
 	SFSampleInfo *sp;
 	patch_rec *rec;
@@ -493,7 +475,7 @@ static int sample_loader(SFInfo *sf, LayerTable *tbl, LoadList *request)
 	if (search_sample(tbl->val[SF_sampleId]))
 		return AWE_RET_OK;
 
-	if (probe_sample(tbl->val[SF_sampleId]))
+	if (probe_sample(ops, tbl->val[SF_sampleId]))
 		return AWE_RET_OK;
 
 	sp = &sf->sample[tbl->val[SF_sampleId]];
@@ -544,7 +526,7 @@ static int sample_loader(SFInfo *sf, LayerTable *tbl, LoadList *request)
 	/* not including the patch header size */
 	rec->patch.type = AWE_LOAD_DATA;
 	rec->patch.reserved = 0;
-	if (load_patch(rec, AWE_PATCH_INFO_SIZE + rec->patch.len) == -1) {
+	if (ops->load_patch(rec, AWE_PATCH_INFO_SIZE + rec->patch.len) < 0) {
 		safe_free(rec);
 		if (errno == ENOSPC)
 			return AWE_RET_NOMEM;
@@ -565,15 +547,15 @@ static int sample_loader(SFInfo *sf, LayerTable *tbl, LoadList *request)
  * load instrument data
  *================================================================*/
 
-static int load_infos(SFInfo *sf, int layer, LoadList *request, LoadList *exlist)
+static int load_infos(AWEOps *ops, SFInfo *sf, int layer, LoadList *request, LoadList *exlist)
 {
-	return parse_preset_layers(sf, &sf->preset[layer], request, exlist,
+	return parse_preset_layers(ops, sf, &sf->preset[layer], request, exlist,
 				   info_loader);
 }
 
 /* instrument patch loader */
 
-static int info_loader(SFInfo *sf, LayerTable *tbl, LoadList *request)
+static int info_loader(AWEOps *ops, SFInfo *sf, LayerTable *tbl, LoadList *request)
 {
 	static awe_voice_rec_patch vrec;
 	awe_voice_info *vp = &vrec.info;
@@ -615,7 +597,7 @@ static int info_loader(SFInfo *sf, LayerTable *tbl, LoadList *request)
 	vrec.patch.reserved = 0;
 
 	/* then, put it to sequencer */
-	if (load_patch(&vrec, sizeof(vrec)) < 0) {
+	if (ops->load_patch(&vrec, sizeof(vrec)) < 0) {
 		if (awe_verbose)
 			fprintf(stderr, "awe: can't load voice info\n");
 		return AWE_RET_ERR;
@@ -850,7 +832,7 @@ static void set_lfo2(SFInfo *sf, awe_voice_info *vp, LayerTable *tbl)
  * loader = loading function
  *================================================================*/
 
-static int parse_preset_layers(SFInfo *sf, SFPresetHdr *preset,
+static int parse_preset_layers(AWEOps *ops, SFInfo *sf, SFPresetHdr *preset,
 			       LoadList *request, LoadList *exlist,
 			       Loader loader)
 {
@@ -879,7 +861,7 @@ static int parse_preset_layers(SFInfo *sf, SFPresetHdr *preset,
 		set_to_table(sf, &tbl, layp, P_LAYER);
 		
 		/* parse the instrument layers */
-		rc = parse_inst_layers(sf, &tbl, request, exlist, loader, 0);
+		rc = parse_inst_layers(ops, sf, &tbl, request, exlist, loader, 0);
 
 		/* fatal error */
 		if (rc == AWE_RET_ERR || rc == AWE_RET_NOMEM)
@@ -916,7 +898,7 @@ static void search_def_drum_inst(SFInfo *sf)
  * level represents the recursive level
  *================================================================*/
 
-static int parse_inst_layers(SFInfo *sf, LayerTable *tbl, LoadList *request,
+static int parse_inst_layers(AWEOps *ops, SFInfo *sf, LayerTable *tbl, LoadList *request,
 			     LoadList *exlist, Loader loader, int level)
 {
 	SFInstHdr *inst;
@@ -968,7 +950,7 @@ static int parse_inst_layers(SFInfo *sf, LayerTable *tbl, LoadList *request,
 			merge_table(sf, &ctbl, tbl);
 			if (! sanity_range(&ctbl))
 				continue;
-			rc = parse_inst_layers(sf, &ctbl, request, exlist,
+			rc = parse_inst_layers(ops, sf, &ctbl, request, exlist,
 					       loader, level+1);
 			if (rc == AWE_RET_NOMEM || rc == AWE_RET_ERR)
 				return rc;
@@ -988,7 +970,7 @@ static int parse_inst_layers(SFInfo *sf, LayerTable *tbl, LoadList *request,
 					continue;
 			}
 
-			rc = loader(sf, &ctbl, request);
+			rc = loader(ops, sf, &ctbl, request);
 			if (rc == AWE_RET_NOMEM || rc == AWE_RET_ERR)
 				return rc;
 		}

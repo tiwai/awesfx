@@ -26,14 +26,6 @@
 #include "util.h"
 #include "config.h"
 
-#ifndef BUILD_BIG_ENDIAN
-#if defined(ENDIAN) && defined(BIG_ENDIAN)
-#ifdef ENDIAN==BIG_ENDIAN
-#define BUILD_BIG_ENDIAN
-#endif
-#endif
-#endif
-
 /*================================================================
  * preset / instrument bag record
  *================================================================*/
@@ -56,11 +48,11 @@ static SFBags prbags, inbags;
 
 #define READID(var,fd)	fread(var, 4, 1, fd)
 #define READSTR(var,fd)	fread(var, 20, 1, fd)
-#ifndef BUILD_BIG_ENDIAN
+#ifndef WORDS_BIGENDIAN
 #define READCHUNK(var,fd)	fread(&var, 8, 1, fd)
 #define READDW(var,fd)	fread(&var, 4, 1, fd)
 #define READW(var,fd)	fread(&var, 2, 1, fd)
-#else /* BIG_ENDIAN */
+#else /* WORDS_BIGENDIAN */
 #define XCHG_SHORT(x) ((((x)&0xFF)<<8) | (((x)>>8)&0xFF))
 #define XCHG_LONG(x) ((((x)&0xFF)<<24) | \
 		      (((x)&0xFF00)<<8) | \
@@ -124,7 +116,7 @@ enum {
  * load a soundfont file
  *================================================================*/
 
-int load_soundfont(SFInfo *sf, FILE *fd, int is_seekable)
+int awe_load_soundfont(SFInfo *sf, FILE *fd, int is_seekable)
 {
 	SFChunk chunk;
 
@@ -182,7 +174,7 @@ int load_soundfont(SFInfo *sf, FILE *fd, int is_seekable)
  * free buffer
  *================================================================*/
 
-void free_soundfont(SFInfo *sf)
+void awe_free_soundfont(SFInfo *sf)
 {
 	int i;
 	if (sf->preset) {

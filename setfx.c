@@ -33,7 +33,7 @@
 #include "util.h"
 #include "seq.h"
 #include "aweseq.h"
-#include "version.h"
+#include "awe_version.h"
 
 /*----------------------------------------------------------------*/
 
@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 		default_sf_path = safe_strdup(DEFAULT_SF_PATH);
 #endif
 
-	if (! search_file_name(sfname, argv[optind], default_sf_path, NULL)) {
+	if (! awe_search_file_name(sfname, sizeof(sfname), argv[optind], default_sf_path, NULL)) {
 		fprintf(stderr, "%s: can't find such a file %s\n",
 			progname, argv[optind]);
 		return 1;

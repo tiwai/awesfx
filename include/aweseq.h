@@ -28,28 +28,27 @@
  * initialize and finish the loading
  *----------------------------------------------------------------*/
 
-int awe_open_font(SFInfo *sf, FILE *fp, int locked);
-void awe_close_font(SFInfo *sf);
+int awe_open_font(AWEOps *ops, SFInfo *sf, FILE *fp, int locked);
+void awe_close_font(AWEOps *ops, SFInfo *sf);
 int awe_is_ram_fonts(SFInfo *sf);
 
-int awe_open_patch(char *name, int type, int locked);
-int awe_close_patch(void);
-int awe_load_map(LoadList *lp);
+int awe_open_patch(AWEOps *ops, char *name, int type, int locked);
+int awe_close_patch(AWEOps *ops);
+int awe_load_map(AWEOps *ops, LoadList *lp);
 
 /*----------------------------------------------------------------
  * load each preset: load a preset "pat" on "map"
  *----------------------------------------------------------------*/
 
-int awe_load_font(SFInfo *sf, SFPatchRec *pat, SFPatchRec *map);
-int awe_load_font_list(SFInfo *sf, LoadList *part_list, int load_alt);
+int awe_load_font(AWEOps *ops, SFInfo *sf, SFPatchRec *pat, SFPatchRec *map);
+int awe_load_font_list(AWEOps *ops, SFInfo *sf, LoadList *part_list, int load_alt);
 
 
 /*----------------------------------------------------------------
  * load the whole file (with checking loadlist)
  *----------------------------------------------------------------*/
 
-/*int awe_load_font_buffered(SFInfo *sf, LoadList *part_only, LoadList *exclude, int load_alt);*/
-int awe_load_all_fonts(SFInfo *sf, LoadList *exclude);
+int awe_load_all_fonts(AWEOps *ops, SFInfo *sf, LoadList *exclude);
 
 
 #endif	/* AWESEQ_H_DEF */

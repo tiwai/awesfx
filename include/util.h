@@ -61,28 +61,7 @@ int bool_val(char *val);
 void fskip(int size, FILE *fd, int seekable);
 
 /* path.c */
-int search_file_name(char *fresult, char *fname, char *path, char **ext);
-
-/* mygetopt.c */
-
-typedef struct awe_option_args {
-	char *str;
-	int has_arg;
-	int *flag;
-	int val;
-} awe_option_args;
-
-/*
-#define	no_argument		0
-#define required_argument	1
-#define optional_argument	2
-*/
-
-int awe_getopt(int argc, char **argv, char *optstr, awe_option_args *args, int *optind);
-int awe_get_argument(int argc, char **argv, char *optstr, awe_option_args *args);
-
-extern char *optarg;
-extern int optind;
+int awe_search_file_name(char *fresult, int maxlen, char *fname, char *path, char **ext);
 
 
 #endif

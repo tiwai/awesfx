@@ -31,7 +31,7 @@
 #include "guspatch.h"
 #include "seq.h"
 #include "util.h"
-#include "version.h"
+#include "awe_version.h"
 
 void seq_load_gus(FILE *fd);
 

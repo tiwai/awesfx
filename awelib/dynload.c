@@ -29,7 +29,7 @@ static void set_preset(SFPatchRec *pat, char *arg);
 
 /*----------------------------------------------------------------*/
 
-LoadList *add_loadlist(LoadList *list, SFPatchRec *pat, SFPatchRec *map)
+LoadList *awe_add_loadlist(LoadList *list, SFPatchRec *pat, SFPatchRec *map)
 {
 	LoadList *rec;
 	rec = (LoadList*)safe_malloc(sizeof(LoadList));
@@ -44,18 +44,18 @@ LoadList *add_loadlist(LoadList *list, SFPatchRec *pat, SFPatchRec *map)
 }
 
 /* add the elements in the latter list to the former one */
-LoadList *merge_loadlist(LoadList *list, LoadList *old)
+LoadList *awe_merge_loadlist(LoadList *list, LoadList *old)
 {
 	LoadList *p;
 	for (p = old; p; p = p->next) {
-		list = add_loadlist(list, &p->pat, &p->map);
+		list = awe_add_loadlist(list, &p->pat, &p->map);
 		list->loaded  = p->loaded;
 	}
 	return list;
 }
 
 /* free all the elements in the list */
-void free_loadlist(LoadList *p)
+void awe_free_loadlist(LoadList *p)
 {
 	LoadList *next;
 	for (; p; p = next) {

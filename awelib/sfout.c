@@ -26,14 +26,6 @@
 #include "sffile.h"
 #include "config.h"
 
-#ifndef BUILD_BIG_ENDIAN
-#if defined(ENDIAN) && defined(BIG_ENDIAN)
-#ifdef ENDIAN==BIG_ENDIAN
-#define BUILD_BIG_ENDIAN
-#endif
-#endif
-#endif
-
 /*----------------------------------------------------------------
  * prototypes
  *----------------------------------------------------------------*/
@@ -46,7 +38,7 @@ static void write_pdta(SFInfo *sf, FILE *fin, FILE *fout);
 static void copy_file(int size, FILE *fin, FILE *fout);
 
 
-#ifndef BUILD_BIG_ENDIAN
+#ifndef WORDS_BIGENDIAN
 #define READCHUNK(var,fd)	fread(&var, 8, 1, fd)
 #define WRITECHUNK(var,fd)	fwrite(&var, 8, 1, fd)
 #define WRITEW(var,fd)		fwrite(&var, 2, 1, fd)
@@ -73,7 +65,7 @@ static void copy_file(int size, FILE *fin, FILE *fout);
  * save the soundfont info to a file
  *----------------------------------------------------------------*/
 
-void save_soundfont(SFInfo *sf, FILE *fin, FILE *fout)
+void awe_save_soundfont(SFInfo *sf, FILE *fin, FILE *fout)
 {
 	write_header(sf, fin, fout);
 	write_info(sf, fin, fout);

@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include "util.h"
 #include "sffile.h"
-#include "version.h"
+#include "awe_version.h"
 
 int seqfd, awe_dev;
 static SFInfo sfinfo;
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 		fprintf(stderr, "can't open text file %s\n", argv[1]);
 		return 1;
 	}
-	load_textinfo(&sfinfo, fp);
+	awe_load_textinfo(&sfinfo, fp);
 	CmpCloseFile(fp, piped);
 
 	if ((fp = fopen(argv[2], "r")) == NULL) {
@@ -64,12 +64,12 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	save_soundfont(&sfinfo, fp, fout);
+	awe_save_soundfont(&sfinfo, fp, fout);
 
 	fclose(fp);
 	fclose(fout);
 
-	/*free_soundfont(&sfinfo);*/
+	/*awe_free_soundfont(&sfinfo);*/
 	return 0;
 }
 

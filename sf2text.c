@@ -49,7 +49,7 @@ int main(int argc, char  **argv)
 		fprintf(stderr, "can't open file %s\n", argv[1]);
 		return 1;
 	}
-	if (load_soundfont(&sfinfo, fd, !piped) < 0)
+	if (awe_load_soundfont(&sfinfo, fd, !piped) < 0)
 		return 1;
 	fclose(fd);
 

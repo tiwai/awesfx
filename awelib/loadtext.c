@@ -43,7 +43,7 @@ static void load_sample(SFInfo *sf, SList at);
  * load the text file
  *----------------------------------------------------------------*/
 
-void load_textinfo(SFInfo *sf, FILE *fp)
+void awe_load_textinfo(SFInfo *sf, FILE *fp)
 {
 	SList list;
 	while ((list = SReadFile(fp)) != NIL) {

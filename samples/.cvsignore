@@ -1,4 +1,2 @@
 Makefile
 Makefile.in
-libawe.so*
-.deps

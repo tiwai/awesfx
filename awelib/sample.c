@@ -24,9 +24,9 @@
 #include "util.h"
 
 /* add blank loop for each data */
-int auto_add_blank = 0;
+int awe_auto_add_blank = 0;
 
-void correct_samples(SFInfo *sf)
+void awe_correct_samples(SFInfo *sf)
 {
 	int i;
 	SFSampleInfo *sp;
@@ -47,7 +47,7 @@ void correct_samples(SFInfo *sf)
 			sp->size = 0;
 		else {
 			sp->size = -1;
-			if (!auto_add_blank && i != sf->nsamples-1)
+			if (!awe_auto_add_blank && i != sf->nsamples-1)
 				sp->size = sp[1].startsample - sp->startsample;
 			if (sp->size < 0)
 				sp->size = sp->endsample - sp->startsample + 48;
@@ -55,7 +55,7 @@ void correct_samples(SFInfo *sf)
 		prev_end = sp->endsample;
 
 		/* calculate short-shot loop size */
-		if (auto_add_blank || i == sf->nsamples-1)
+		if (awe_auto_add_blank || i == sf->nsamples-1)
 			sp->loopshot = 48;
 		else {
 			sp->loopshot = sp[1].startsample - sp->endsample;

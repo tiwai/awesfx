@@ -21,17 +21,25 @@
 #ifndef AWEBANK_H_DEF
 #define AWEBANK_H_DEF
 
-/* external variable */
-
-extern int seqfd;
-extern int awe_dev;
-
 /* return value */
 #define AWE_RET_OK		0	/* successfully loaded */
 #define AWE_RET_ERR		1	/* some fatal error occurs */
 #define AWE_RET_SKIP		2	/* some fonts are skipped */
 #define AWE_RET_NOMEM		3	/* out or memory; not all fonts loaded */
 #define AWE_RET_NOT_FOUND	4	/* the file is not found */
+
+
+/*----------------------------------------------------------------
+ * operators
+ *----------------------------------------------------------------*/
+
+typedef struct _AWEOps {
+	int (*load_patch)(void *buf, int len);
+	int (*mem_avail)(void);
+	int (*reset_samples)(void);
+	int (*remove_samples)(void);
+	int (*set_zero_atten)(int val);
+} AWEOps;
 
 
 /*----------------------------------------------------------------
@@ -52,19 +60,19 @@ int awe_parse_loadlist(char *arg, SFPatchRec *pat, SFPatchRec *map, char **strp)
 
 
 /* dynamic loading list */
-typedef struct _LoadList {
+typedef struct _AWELoadList {
 	SFPatchRec pat;
 	SFPatchRec map;
 	int loaded;
-	struct _LoadList *next;
+	struct _AWELoadList *next;
 } LoadList;
 
 /* add a patch set on the list */
-LoadList *add_loadlist(LoadList *list, SFPatchRec *pat, SFPatchRec *map);
+LoadList *awe_add_loadlist(LoadList *list, SFPatchRec *pat, SFPatchRec *map);
 /* merge the elements in latter list */
-LoadList *merge_loadlist(LoadList *list, LoadList *old);
+LoadList *awe_merge_loadlist(LoadList *list, LoadList *old);
 /* free all list elements */
-void free_loadlist(LoadList *p);
+void awe_free_loadlist(LoadList *p);
 
 /*----------------------------------------------------------------
  * load a soundfont or virtual bank file
@@ -76,8 +84,7 @@ void free_loadlist(LoadList *p);
  * The locked fonts are not removed by -x option of sfxload.
  *----------------------------------------------------------------*/
 
-int awe_load_bank(char *name, LoadList *list, int locked);
+int awe_load_bank(AWEOps *ops, char *name, LoadList *list, int locked);
 
 
 #endif	/* AWEBANK_H_DEF */
-

@@ -27,6 +27,9 @@
 #include "config.h"
 
 
+#define SYSTEM_RCFILE		"/etc/sfxloadrc"
+#define RCFILE			".sfxloadrc"
+
 #define DEFAULT_ID	"default"
 
 typedef struct OptionFile {
@@ -93,10 +96,13 @@ static void parse_named_option(char *fname)
 {
 	OptionFile *p;
 	for (p = optlist; p; p = p->next) {
+		int optind_save = optind;
+		optind = 0;
 		if (strcmp(p->argv[0], fname) == 0) {
 			while (awe_parse_options(p->argc, p->argv, 0, 0, 0) == 0)
 				;
 		}
+		optind = optind_save;
 	}
 }
 
@@ -127,7 +133,7 @@ void awe_read_option_file(char *fname)
 
 #define DEFAULT_OPTION_NUM	10
 
-static awe_option_args long_options[40] = {
+static struct option long_options[40] = {
 	{"addblank", 2, 0, 'B'},
 	{"bank", 2, 0, 'b'},
 	{"chorus", 1, 0, 'c'},
@@ -144,26 +150,32 @@ static awe_option_args long_options[40] = {
 #define set_bool()	(optarg ? bool_val(optarg) : TRUE)
 
 int awe_parse_options(int argc, char **argv, char *optflags,
-		      awe_option_args *long_opts, int *optidx)
+		      struct option *long_opts, int *optidx)
 {
 	int c;
 	int ival;
 	double dval;
 	static char options[100];
 
+	if (optflags) {
+		if (strlen(OPTION_FLAGS) + strlen(optflags) >= sizeof(options))
+			return -1;
+	}
 	strcpy(options, OPTION_FLAGS);
 	if (optflags)
 		strcat(options, optflags);
 	c = DEFAULT_OPTION_NUM;
 	if (long_opts) {
-		awe_option_args *p;
-		for (p = long_opts; p->str; p++)
+		struct option *p;
+		for (p = long_opts; p->name; p++) {
+			if (c >= numberof(long_options))
+				return -1;
 			long_options[c++] = *p;
+		}
 	}
-	long_options[c].str = 0;
+	long_options[c].name = 0;
 
-	if ((c = awe_getopt(argc, argv, options, long_options, optidx)) == -1)
-
+	if ((c = getopt_long(argc, argv, options, long_options, optidx)) == -1)
 		return -1;
 
 	switch (c) {

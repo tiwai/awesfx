@@ -1,1 +1,6 @@
 Makefile
+Makefile.in
+awe_version.h
+config.h
+config.h.in
+stamp-*

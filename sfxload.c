@@ -25,11 +25,20 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/fcntl.h>
-#include "util.h"
+#include <util.h>
+#ifdef BUILD_ASFXLOAD
+#include <alsa/asoundlib.h>
+#endif
+#include <awebank.h>
+#include <sfopts.h>
+#include <awe_version.h>
 #include "seq.h"
-#include "awebank.h"
-#include "sfopts.h"
-#include "version.h"
+
+#ifdef BUILD_ASFXLOAD
+#define PROGNAME "asfxload"
+#else
+#define PROGNAME "sfxload"
+#endif
 
 static char *get_fontname(int argc, char **argv);
 static int parse_options(int argc, char **argv);
@@ -37,38 +46,60 @@ static void add_part_list(char *arg);
 
 extern int awe_verbose;
 
+static AWEOps load_ops = {
+	seq_load_patch,
+	seq_mem_avail,
+	seq_reset_samples,
+	seq_remove_samples,
+#ifndef BUILD_ASFXLOAD
+	seq_zero_atten
+#endif
+};
+
+
+
 /*----------------------------------------------------------------
  * print usage and exit
  *----------------------------------------------------------------*/
 
 static void usage()
 {
-	fprintf(stderr, "sfxload -- load SoundFont on AWE32 sound driver\n");
-	fprintf(stderr, VERSION_NOTE);
-	fprintf(stderr, "usage:	sfxload [-options] [soundfont[.sf2|.sbk|.bnk]]\n");
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, " options:\n");
-	fprintf(stderr, " -F, --device=file        specify the device file\n");
-	fprintf(stderr, " -D, --index=number       specify the device index (-1=autoprobe)\n");
-	fprintf(stderr, " -i, --clear[=bool]       clear all samples\n");
-	fprintf(stderr, " -x, --remove[=bool]      remove additional samples\n");
-	fprintf(stderr, " -N, --increment[=bool]   incremental loading\n");
-	fprintf(stderr, " -b, --bank=number        append font to the specified bank\n");
-	fprintf(stderr, " -l, --lock[=bool]        lock the loading fonts\n");
-	fprintf(stderr, " -d, --device=file        use the given device file\n");
-	fprintf(stderr, " -C, --compat[=bool]      use v0.4.2 compatible sounds\n");
+	fputs(
+#ifdef BUILD_ASFXLOAD
+	      "asfxload -- load SoundFont on ALSA Emux WaveTable\n"
+#else
+	      "sfxload -- load SoundFont on OSS AWE32 sound driver\n"
+#endif
+	      VERSION_NOTE
+	      "usage:	" PROGNAME " [-options] [soundfont[.sf2|.sbk|.bnk]]\n"
+	      "\n"
+	      " options:\n"
+#ifdef BUILD_ASFXLOAD
+	      " -D, --hwdep=name        specify the hwdep name\n"
+#else
+	      " -F, --device=file        specify the device file\n"
+	      " -D, --index=number       specify the device index (-1=autoprobe)\n"
+#endif
+	      " -i, --clear[=bool]       clear all samples\n"
+	      " -x, --remove[=bool]      remove additional samples\n"
+	      " -N, --increment[=bool]   incremental loading\n"
+	      " -b, --bank=number        append font to the specified bank\n"
+	      " -l, --lock[=bool]        lock the loading fonts\n"
+	      " -C, --compat[=bool]      use v0.4.2 compatible sounds\n",
+	      stderr);
 	fprintf(stderr, " -A, --sense=digit        (compat) set attenuation sensitivity (default=%g)\n", awe_option.atten_sense);
 	fprintf(stderr, " -a, --atten=digit        (compat) set default attenuattion (default=%d)\n", awe_option.default_atten);
 	fprintf(stderr, " -d, --decay=scale        (compat) set decay time scale (default=%g)\n", awe_option.decay_sense);
-	fprintf(stderr, " -M, --memory[=bool]      display available memory on DRAM\n");
-	fprintf(stderr, " -B, --addblank[=bool]    add 12 words blank loop on each sample\n");
-	fprintf(stderr, " -c, --chorus=percent     set chorus effect (0-100)\n");
-	fprintf(stderr, " -r, --reverb=percent     set reverb effect (0-100)\n");
+	fputs(" -M, --memory[=bool]      display available memory on DRAM\n"
+	      " -B, --addblank[=bool]    add 12 words blank loop on each sample\n"
+	      " -c, --chorus=percent     set chorus effect (0-100)\n"
+	      " -r, --reverb=percent     set reverb effect (0-100)\n",
+	      stderr);
 	fprintf(stderr, " -V, --volume=percent     set total volume (0-100) (default=%d)\n", awe_option.default_volume);
-	fprintf(stderr, " -L, --extract=preset/bank/note\n");
-	fprintf(stderr, "                          do partial loading\n");
-	fprintf(stderr, " -P, --path=dir           set SoundFont file search path\n");
+	fputs(" -L, --extract=preset/bank/note\n"
+	      "                          do partial loading\n"
+	      " -P, --path=dir           set SoundFont file search path\n",
+	      stderr);
 	if (awe_option.search_path)
 		fprintf(stderr, "   system default path is %s\n", awe_option.search_path);
 	exit(1);
@@ -77,8 +108,12 @@ static void usage()
 
 static int sample_mode, remove_samples, dispmem, lock_sf;
 enum { CLEAR_SAMPLE, INCREMENT_SAMPLE, ADD_SAMPLE };
+#ifdef BUILD_ASFXLOAD
+static char *hwdep_name = NULL;
+#else
 static char *seq_devname = NULL;
 static int seq_devidx = -1;
+#endif
 
 static LoadList *part_list = NULL;
 
@@ -116,8 +151,12 @@ int main(int argc, char **argv)
 	}
 
 	/*----------------------------------------------------------------*/
+#ifdef BUILD_ASFXLOAD
+	seq_alsa_init(hwdep_name);
+#else
 	/* reset samples if necessary */
 	seq_init(seq_devname, seq_devidx);
+#endif
 
 	/* clear or remove samples */
 
@@ -134,7 +173,11 @@ int main(int argc, char **argv)
 			printf("DRAM memory left = %d kB\n", seq_mem_avail()/1024);
 	}
 	if (sffile == NULL) {
+#ifdef BUILD_ASFXLOAD
+		seq_alsa_end();
+#else
 		seq_end();
+#endif
 		return 0;
 	}
 
@@ -146,18 +189,22 @@ int main(int argc, char **argv)
 			lock_sf = FALSE;
 	}
 
-	rc = awe_load_bank(sffile, part_list, lock_sf);
+	rc = awe_load_bank(&load_ops, sffile, part_list, lock_sf);
 	if (sample_mode == INCREMENT_SAMPLE && remove_samples) {
 		if (rc == AWE_RET_NOMEM) {
 			seq_remove_samples();
-			rc = awe_load_bank(sffile, part_list, lock_sf);
+			rc = awe_load_bank(&load_ops, sffile, part_list, lock_sf);
 		}
 	}
 
 	if (rc == AWE_RET_OK && dispmem)
 		printf("DRAM memory left = %d kB\n", seq_mem_avail()/1024);
 
+#ifdef BUILD_ASFXLOAD
+		seq_alsa_end();
+#else
 	seq_end();
+#endif
 	if (rc == AWE_RET_NOMEM) {
 		if (awe_verbose)
 			fprintf(stderr, "sfxload: no memory left\n");
@@ -178,7 +225,7 @@ int main(int argc, char **argv)
  * long options
  *----------------------------------------------------------------*/
 
-static awe_option_args long_options[] = {
+static struct option long_options[] = {
 	{"memory", 2, 0, 'M'},
 	{"remove", 2, 0, 'x'},
 	{"increment", 2, 0, 'N'},
@@ -186,13 +233,34 @@ static awe_option_args long_options[] = {
 	{"verbose", 2, 0, 'v'},
 	{"extract", 1, 0, 'L'},
 	{"lock", 2, 0, 'l'},
+#ifdef BUILD_ASFXLOAD
+	{"hwdep", 1, 0, 'D'},
+#else
 	{"device", 1, 0, 'F'},
 	{"index", 1, 0, 'D'},
+#endif
 	{0, 0, 0, 0},
 };
 static int option_index;
 
+#ifdef BUILD_ASFXLOAD
+#define OPTION_FLAGS	"MxNivL:lD:"
+#else
 #define OPTION_FLAGS	"MxNivL:lF:D:"
+#endif
+
+int awe_get_argument(int argc, char **argv, char *optstr, struct option *args)
+{
+	int c, dummy;
+	int optind_saved;
+	optind_saved = optind;
+	optind = 0;
+	while ((c = getopt_long(argc, argv, optstr, args, &dummy)) != -1)
+		;
+	c = optind;
+	optind = optind_saved;
+	return c;
+}
 
 static char *get_fontname(int argc, char **argv)
 {
@@ -239,13 +307,18 @@ static int parse_options(int argc, char **argv)
 			lock_sf = set_bool();
 			break;
 
+#ifdef BUILD_ASFXLOAD
+		case 'D':
+			hwdep_name = optarg;
+			break;
+#else
 		case 'F':
 			seq_devname = optarg;
 			break;
 		case 'D':
 			seq_devidx = atoi(optarg);
 			break;
-
+#endif
 		case 'm':
 		case 's':
 		case 'I':
@@ -271,7 +344,7 @@ static void add_part_list(char *arg)
 	}
 	strcpy(tmp, arg);
 	if (awe_parse_loadlist(tmp, &pat, &map, NULL))
-		part_list = add_loadlist(part_list, &pat, &map);
+		part_list = awe_add_loadlist(part_list, &pat, &map);
 }
 
 

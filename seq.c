@@ -32,7 +32,7 @@
 #  include <linux/soundcard.h>
 #  include <linux/awe_voice.h>
 #endif
-#include "util.h"
+#include <util.h>
 #include "seq.h"
 
 SEQ_DEFINEBUF(128);
@@ -112,12 +112,13 @@ static void seq_init_priv(char *devname, int devidx)
 	}
 }
 
-void seq_reset_samples(void)
+int seq_reset_samples(void)
 {
 	if (ioctl(seqfd, SNDCTL_SEQ_RESETSAMPLES, &awe_dev) == -1) {
 		perror("Sample reset");
 		exit(1);
 	}
+	return 0;
 }
 
 void seq_end(void)
@@ -127,9 +128,10 @@ void seq_end(void)
 	close(seqfd);
 }
 
-void seq_remove_samples(void)
+int seq_remove_samples(void)
 {
 	AWE_REMOVE_LAST_SAMPLES(seqfd, awe_dev);
+	return 0;
 }
 
 void seq_default_atten(int val)
@@ -162,3 +164,11 @@ int seq_mem_avail(void)
 	return mem_avail;
 }
 
+int seq_zero_atten(int atten)
+{
+	/* set zero attenuation level; this doesn't use seqbuf */
+	/* flag 0x40 is the ossseq global flag */
+	_AWE_CMD_NOW(seqfd, awe_dev, 0, _AWE_MISC_MODE|0x40,
+		     AWE_MD_ZERO_ATTEN, atten);
+	return 0;
+}

@@ -1,6 +1,6 @@
 ================================================================
     AWE32 Sound Driver Utility Programs for Linux / FreeBSD
-		version 0.4.4; Aug. 1, 2000
+		version 0.5.0
 
 		Takashi Iwai <tiwai@suse.de>
 ================================================================
@@ -8,9 +8,13 @@
 ----------------------------------------------------------------
 * GENERAL NOTES
 
-Thie package includes a couple of utilities for AWE32 sound driver on
-Linux and FreeBSD systems.  You need to use these utilities to enable
-sounds on the driver properly.
+Thie package includes several utilities for AWE32 sound driver on
+Linux and FreeBSD systems and for Emux WaveTable of ALSA sbawe and
+emu10k1 drivers.  You need to use these utilities to enable sounds on
+these drivers properly.
+
+The package is managed with GNU auto-tools since version 0.5.0.
+The ALSA support (asfxload) is added also in this version.
 
 Ver.0.4.3 improves the parameter calculation as almost compatible with
 the DOS/Win drivers.  This is more effective in the case of ROM sounds.
@@ -18,6 +22,10 @@ If you prefer the old type sounds, use --compatible option.
 
 This packaing contains the following programs:
 
+for ALSA
+ - asfxload	SoundFont file loader
+
+for OSS
  - sfxload	SoundFont file loader
  - setfx	Chorus/reverb effect loader
  - aweset	Change the running mode of AWE driver
@@ -27,16 +35,20 @@ This packaing contains the following programs:
  - sfxtest	Example program to control AWE driver
 
 The package includes the correction of SoundFont managing routines,
-called AWElib.  As default, the AWElib is installed as a shared
-library.
+called AWElib.  As default, the AWElib is *NOT* installed.
+For installing it, modify awelib/Makefile.am.
 
 ----------------------------------------------------------------
-* SFXLOAD
+* SFXLOAD and ASFXLOAD
 
-SFXLOAD is a utility program to transfer the sound wave and
-instruments data in a SoundFont file to the AWE32 sound driver.
+SFXLOAD and ASFXLOAD are utility program sto transfer the sound wave
+and instruments data in a SoundFont file to the AWE32 sound driver,
+or to the Emux WaveTable of ALSA sbawe and emu10k1 drivers.
 This program is necessary for playing MIDI samples via sequencer
-programs supporting AWE driver.
+programs supporting AWE driver.  There is no big difference between
+sfxload and asfxload except for that asfxload is for ALSA and sfxload
+is for OSS, respecitvely.  The options to specify devices are
+different between them.
 
 Basically, sfxload behaves as two ways.
 
@@ -410,7 +422,7 @@ parameter calculations.
 ----------------------------------------------------------------
 * COPYRIGHT
 
-Copyright (C) 1996-1999 by Takashi Iwai
+Copyright (C) 1996-2003 by Takashi Iwai
 
 These programs are free software; you can redistribute them and/or
 modify them under the terms of the GNU General Public License as

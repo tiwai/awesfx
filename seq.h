@@ -2,7 +2,7 @@
  * seq.h
  *	sequencer control routine
  *
- * Copyright (C) 1996-1998 Takashi Iwai
+ * Copyright (C) 1996-2003 Takashi Iwai
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,14 +30,18 @@ extern int awe_dev;
 #define OSS_SEQUENCER_DEV	"/dev/sequencer"
 
 void seq_init(char *devname, int devidx);
-void seq_reset_samples(void);
+int seq_reset_samples(void);
 void seq_end(void);
 void seq_default_atten(int val);
-void seq_remove_samples(void);
+int seq_zero_atten(int val);
+int seq_remove_samples(void);
 void seq_initialize_chip(void);
 void seq_set_gus_bank(int bank);
 int seq_load_patch(void *patch, int len);
 int seq_mem_avail(void);
 
+/* alsa.c */
+void seq_alsa_init(char *hwdep);
+void seq_alsa_end(void);
 
 #endif
