@@ -1,3 +1,15 @@
+ver.0.5.0
+	- Support ALSA emux hwdep interface.  asfxload is added.
+	  The hardware access operators are packed as AWEOps struct,
+	  the awelib no longer accesses the DSP i/o directly.
+	- Use GNU auto-tools instead of Imake.
+	- Moved docs and some files in the root directory for GNU style.
+	- Fixed some buffer-overflows.
+	- Build awelib static.
+	- Added awe_ prefix to some awelib functions to avoid name
+	  conflictions.
+	- Changed the default SoundFont path.
+	
 ver.0.4.4
 	- Fixed Makefiles
 	- Fixed big-endian handling

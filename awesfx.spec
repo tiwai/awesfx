@@ -10,7 +10,7 @@
 
 # norootforbuild
 # neededforbuild  alsa alsa-devel
-# usedforbuild    aaa_base acl attr bash bind-utils bison bzip2 coreutils cpio cpp cvs cyrus-sasl db devs diffutils e2fsprogs file filesystem fillup findutils flex gawk gdbm-devel glibc glibc-devel glibc-locale gpm grep groff gzip info insserv kbd less libacl libattr libgcc libstdc++ libxcrypt m4 make man mktemp modutils ncurses ncurses-devel net-tools netcfg openldap2-client openssl pam pam-devel pam-modules patch permissions popt ps rcs readline sed sendmail shadow strace syslogd sysvinit tar texinfo timezone unzip util-linux vim zlib zlib-devel autoconf automake binutils cracklib gcc gdbm gettext libtool perl rpm
+# usedforbuild    aaa_base acl attr bash bind-utils bison bzip2 coreutils cpio cpp cracklib cvs cyrus-sasl db devs diffutils e2fsprogs file filesystem fillup findutils flex gawk gdbm-devel glibc glibc-devel glibc-locale gpm grep groff gzip info insserv kbd less libacl libattr libgcc libstdc++ libxcrypt m4 make man mktemp modutils ncurses ncurses-devel net-tools netcfg openldap2-client openssl pam pam-modules patch permissions popt ps rcs readline sed sendmail shadow strace syslogd sysvinit tar texinfo timezone unzip util-linux vim zlib zlib-devel alsa alsa-devel autoconf automake binutils gcc gdbm gettext libtool perl rpm
 
 Name:         awesfx
 Summary:      SoundFont utilities for SB AWE32/64 and Emu10k1 drivers
@@ -54,11 +54,14 @@ make DESTDIR=$RPM_BUILD_ROOT install
 %doc AUTHORS COPYING README ChangeLog NEWS
 %doc *.txt
 %{_bindir}/*
-%dir %{_datadir}/sf2
-%{_datadir}/sf2/*
+%dir %{_datadir}/sounds/sf2
+%{_datadir}/sounds/sf2/*
 %doc %{_mandir}/*/*
 
 %changelog -n awesfx
+* Fri Jan 23 2004 - tiwai@suse.de
+- updated to version 0.5.0.  using auto-tools now.
+  ALSA emux loader is added.
 * Sun Jan 11 2004 - adrian@suse.de
 - add %%defattr
 * Fri Mar 08 2002 - kukuk@suse.de
