@@ -33,6 +33,7 @@
 #include "util.h"
 #include "seq.h"
 #include "aweseq.h"
+#include "version.h"
 
 /*----------------------------------------------------------------*/
 
@@ -64,7 +65,7 @@ static int connected;
 static void usage(void)
 {
 	fprintf(stderr, "setfx -- load user defined chorus / reverb mode effects\n");
-	fprintf(stderr, "   version 0.4.3   copyright (c) 1996-1999 by Takashi Iwai\n");
+	fprintf(stderr, VERSION_NOTE);
 	fprintf(stderr, "usage:	setfx config-file\n");
 #ifdef DEFAULT_SF_PATH
 	fprintf(stderr, "   system default path is %s\n", DEFAULT_SF_PATH);

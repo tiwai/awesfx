@@ -1,7 +1,7 @@
 /*================================================================
  * sfxload -- load soundfont info onto awe sound driver
  *
- * Copyright (C) 1996-1999 Takashi Iwai
+ * Copyright (C) 1996-2000 Takashi Iwai
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "seq.h"
 #include "awebank.h"
 #include "sfopts.h"
+#include "version.h"
 
 static char *get_fontname(int argc, char **argv);
 static int parse_options(int argc, char **argv);
@@ -43,7 +44,7 @@ extern int awe_verbose;
 static void usage()
 {
 	fprintf(stderr, "sfxload -- load SoundFont on AWE32 sound driver\n");
-	fprintf(stderr, "   version 0.4.3   copyright (c) 1996-1999 by Takashi Iwai\n");
+	fprintf(stderr, VERSION_NOTE);
 	fprintf(stderr, "usage:	sfxload [-options] [soundfont[.sf2|.sbk|.bnk]]\n");
 	fprintf(stderr, "\n");
 

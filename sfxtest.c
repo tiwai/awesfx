@@ -1,7 +1,7 @@
 /*================================================================
  * sfxtest -- example program to control awe sound driver
  *
- * Copyright (C) 1996-1999 Takashi Iwai
+ * Copyright (C) 1996-2000 Takashi Iwai
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #  include <linux/awe_voice.h>
 #endif
 #include "seq.h"
+#include "version.h"
 
 SEQ_USE_EXTBUF();
 
@@ -308,7 +309,10 @@ int main(int argc, char **argv)
 
 static void usage()
 {
+	fprintf(stderr, "sfxtest - a test program for AWE32/64 driver\n");
+	fprintf(stderr, VERSION_NOTE);
 	fprintf(stderr, "usage: sfxtest cmd pars..\n");
+	fprintf(stderr, "commands =\n");
 	fprintf(stderr, "X: use channel control mode\n");
 	fprintf(stderr, "x channel: change channel\n");
 	fprintf(stderr, "b bank: change bank\n");

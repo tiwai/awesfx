@@ -5,7 +5,7 @@
 INSTDIR = /usr/local
 LIBDIR = $(INSTDIR)/lib
 
-LIBVER = 0.4.3
+LIBVER = 0.4.4
 LIBNAME = awe
 
 LIBSO = lib$(LIBNAME).so

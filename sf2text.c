@@ -1,7 +1,7 @@
 /*================================================================
  * sf2text -- print soundfont layer information
  *
- * Copyright (C) 1996-1999 Takashi Iwai
+ * Copyright (C) 1996-2000 Takashi Iwai
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

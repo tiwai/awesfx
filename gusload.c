@@ -1,7 +1,7 @@
 /*================================================================
  * gusload -- load a GUS patch file on AWE32 sound driver
  *
- * Copyright (C) 1996-1999 Takashi Iwai
+ * Copyright (C) 1996-2000 Takashi Iwai
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include "guspatch.h"
 #include "seq.h"
 #include "util.h"
+#include "version.h"
 
 void seq_load_gus(FILE *fd);
 
@@ -38,7 +39,7 @@ void seq_load_gus(FILE *fd);
 static void usage()
 {
 	fprintf(stderr, "gusload -- load GUS patch file on AWE32 sound driver\n");
-	fprintf(stderr, "   version 0.4.3  copyright (c) 1996-1999 by Takashi Iwai\n");
+	fprintf(stderr, VERSION_NOTE);
 	fprintf(stderr, "usage: gusload [-options] GUSpatch\n");
 	fprintf(stderr, " -v          verbose mode\n");
 	fprintf(stderr, " -p number   set instrument number (default is internal value)\n");

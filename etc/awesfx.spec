@@ -1,22 +1,24 @@
-%define ver	0.4.3c
+%define version	0.4.4
+%define release	1
 
 Summary: AWESFX - library and utilities for AWE driver
 Name: awesfx
-Version: %ver
-Release: 1
+Version: %{version}
+Release: %{release}
 Copyright: GPL
 Group: System/Libraries
-Source: http://members.tripod.de/iwai/awesfx-%{ver}.tgz
-BuildRoot: /tmp/rpmtest
-Packager: Takashi Iwai <iwai@ww.uni-erlangen.de>
+Source: %{name}-%{version}.tar.bz2
+BuildRoot: /tmp/%{name}-%{version}-root
+Packager: Takashi Iwai <tiwai@suse.de>
 URL: http://members.tripod.de/iwai/awedrv.html
+
 %description
 ================================================================
     AWE32 Sound Driver Utility Programs for Linux / FreeBSD
-		version 0.4.3c; Jan. 16, 2000
+		version 0.4.4; Aug. 1, 2000
 
 			Takashi Iwai
-		iwai@ww.uni-erlangen.de
+			tiwai@suse.de
 		http://members.tripod.de/iwai
 ================================================================
 

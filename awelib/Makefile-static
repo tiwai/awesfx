@@ -5,7 +5,7 @@
 INSTDIR = /usr/local
 LIBDIR = $(INSTDIR)/lib
 
-LIBVER = 0.4.3
+LIBVER = 0.4.4
 LIBNAME = awe
 
 LIB = lib$(LIBNAME).a
@@ -14,7 +14,7 @@ CDEBUGFLAGS = -O2
 CINCS = -I../include
 CDEFS = -Wall -Dlinux
 
-CFLAGS = $(CDEBUGS) $(CINCS) $(CDEFS)
+CFLAGS = $(CDEBUGFLAGS) $(CINCS) $(CDEFS)
 
 INSTLIBFLAGS = -c -m 0755
 

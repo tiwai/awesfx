@@ -1,7 +1,7 @@
 /*================================================================
  * text2sf -- convert text to soundfont formmat
  *
- * Copyright (C) 1996-1999 Takashi Iwai
+ * Copyright (C) 1996-2000 Takashi Iwai
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include "util.h"
 #include "sffile.h"
+#include "version.h"
 
 int seqfd, awe_dev;
 static SFInfo sfinfo;
@@ -28,7 +29,7 @@ static SFInfo sfinfo;
 static void usage()
 {
 	fprintf(stderr, "text2sf -- convert text file to soundfont format\n");
-	fprintf(stderr, "   version 0.4.3   copyright (c) 1996-1999 by Takashi Iwai\n");
+	fprintf(stderr, VERSION_NOTE);
 	fprintf(stderr, "usage: text2sf text-file original-file output-file\n");
 	fprintf(stderr, "    text-file: s-list text file via sf2text\n");
 	fprintf(stderr, "    original-file: original soundfont file\n");

@@ -1,7 +1,7 @@
 /*================================================================
  * aweset -- set controlling parameters of awe sound driver
  *
- * Copyright (C) 1996-1999 Takashi Iwai
+ * Copyright (C) 1996-2000 Takashi Iwai
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #endif
 #include "util.h"
 #include "seq.h"
+#include "version.h"
 
 int verbose = 0;
 
@@ -232,7 +233,7 @@ static void usage(void)
 	int i;
 
 	fprintf(stderr, "aweset -- control awedrv parameters\n");
-	fprintf(stderr, "copyright (c) 1998-1999 Takashi Iwai; all rights reserved\n");
+	fprintf(stderr, VERSION_NOTE);
 	fprintf(stderr, "usage: aweset [-options] command [argument] ...\n");
 	fprintf(stderr, "  options:\n");
 	fprintf(stderr, "    --help, -h: put this message\n");
