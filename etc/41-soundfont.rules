@@ -1,0 +1,1 @@
+SUBSYSTEM=="sound", KERNEL=="hwC?D2", DRIVERS=="EMU10K1_Audigy", RUN+="/etc/alsa.d/udev-soundfont"

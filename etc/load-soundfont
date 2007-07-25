@@ -1,0 +1,39 @@
+#!/bin/sh -e
+
+CARD=$1
+shift
+
+test -x /usr/bin/asfxload || exit 0
+
+. /etc/sysconfig/sound
+
+load_sf () {
+  for d in /usr/share/sounds/sf2 \
+           /usr/share/sfbank \
+           /usr/local/lib/sfbank \
+           /usr/share/sfbank/creative \
+           /usr/local/lib/sfbank/creative \
+           ; do
+    if [ -r $d/$1 ]; then
+      /usr/bin/asfxload -Dhw:${CARD},2 $d/$1
+      return 0
+    fi
+  done
+  return 1
+}
+
+case $SOUNDFONT_FILES in
+/*)
+  if [ -r "$SOUNDFONT_FILES" ]; then
+      /usr/bin/asfxload -Dhw:${CARD},2 $SOUNDFONT_FILES
+      exit 0
+  fi
+  ;;
+esac
+
+for file in $SOUNDFONT_FILES $* ; do
+  if load_sf $file ; then
+     break
+  fi
+done
+exit 0

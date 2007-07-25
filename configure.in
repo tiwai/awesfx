@@ -27,5 +27,12 @@ AC_ARG_WITH(sfpath,
   DEFAULT_SF_PATH="/usr/share/sounds/sf2:/usr/share/sfbank:/usr/local/lib/sfbank")
 AC_DEFINE_UNQUOTED(DEFAULT_SF_PATH, "$DEFAULT_SF_PATH", [default SoundFont path])
 
-AC_OUTPUT([Makefile awelib/Makefile include/Makefile samples/Makefile include/awe_version.h])
+AC_OUTPUT([
+	Makefile
+	awelib/Makefile
+	include/Makefile
+	samples/Makefile
+	include/awe_version.h
+	etc/Makefile
+])
 

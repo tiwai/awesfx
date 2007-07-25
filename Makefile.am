@@ -1,4 +1,4 @@
-SUBDIRS = awelib include samples
+SUBDIRS = awelib include samples etc
 
 bin_PROGRAMS = sfxload asfxload aweset gusload setfx sf2text text2sf sfxtest
 LDADD = awelib/libawe.a
@@ -20,7 +20,7 @@ noinst_HEADERS = seq.h guspatch.h
 
 man_MANS = sfxload.1
 
-EXTRA_DIST = sfxload.1 SBKtoSF2.txt awesfx.spec
+EXTRA_DIST = sfxload.1 SBKtoSF2.txt
 
 install-data-hook:
 	rm -f $(DESTDIR)$(mandir)/man1/asfxload.1
