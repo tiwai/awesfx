@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include <alsa/asoundlib.h>
-#include <linux/awe_voice.h>
+#include <awe_voice.h>
 #include <sys/ioctl.h>
 
 #define SNDRV_EMUX_HWDEP_NAME	"Emux WaveTable"

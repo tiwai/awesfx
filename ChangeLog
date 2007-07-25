@@ -1,4 +1,8 @@
-ver.0.5.d
+ver.0.5.1
+	- include awe_voice.h into the package (to fix build with 2.6.22
+	  kernel)
+
+ver.0.5.0d
 	- fixed compilation with gcc-2.x.
 	- added -q (--quiet) option to [a]sfxload.
 	  verbosity is set to 1 as default.

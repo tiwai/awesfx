@@ -1,7 +1,7 @@
 #
-# spec file for package awesfx (Version 0.5.0)
+# spec file for package awesfx (Version 0.5.1)
 #
-# Copyright (c) 2004 SuSE Linux AG, Nuernberg, Germany.
+# Copyright (c) 2004 SUSE LINUX AG, Nuernberg, Germany.
 # This file and all modifications and additions to the pristine
 # package are under the same license as the package itself.
 #
@@ -9,18 +9,20 @@
 #
 
 # norootforbuild
-# neededforbuild  alsa alsa-devel
-# usedforbuild    aaa_base acl attr bash bind-utils bison bzip2 coreutils cpio cpp cracklib cvs cyrus-sasl db devs diffutils e2fsprogs file filesystem fillup findutils flex gawk gdbm-devel glibc glibc-devel glibc-locale gpm grep groff gzip info insserv kbd less libacl libattr libgcc libstdc++ libxcrypt m4 make man mktemp modutils ncurses ncurses-devel net-tools netcfg openldap2-client openssl pam pam-modules patch permissions popt ps rcs readline sed sendmail shadow strace syslogd sysvinit tar texinfo timezone unzip util-linux vim zlib zlib-devel alsa alsa-devel autoconf automake binutils gcc gdbm gettext libtool perl rpm
 
 Name:         awesfx
+BuildRequires: alsa-devel
 Summary:      SoundFont utilities for SB AWE32/64 and Emu10k1 drivers
-Version:      0.5.0
-Release:      0
+Version:      0.5.1
+Release:      1
 License:      GPL
 Group:        Productivity/Multimedia/Sound/Midi
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
 URL:          http://www.alsa-project.org/~iwai/awedrv.html
 Source:       awesfx-%{version}.tar.bz2
+Source1:      udev-soundfont
+Source2:      load-soundfont
+Source3:      41-soundfont.rules
 
 %description
 The AWESFX package includes utility programs for controlling the
@@ -34,17 +36,21 @@ Authors:
 
 %prep
 %setup
+%{?suse_update_config:%{suse_update_config -f}}
 
 %build
-%{?suse_update_config:%{suse_update_config -f}}
 autoreconf -fi
-CFLAGS="$RPM_OPT_FLAGS" \
-./configure --prefix=%{_prefix} --mandir=%{_mandir}
+%configure
 make
 
 %install
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
+# install udev and helper scripts
+mkdir -p $RPM_BUILD_ROOT/etc/udev/rules.d
+cp $RPM_SOURCE_DIR/*.rules $RPM_BUILD_ROOT/etc/udev/rules.d
+mkdir -p $RPM_BUILD_ROOT/etc/alsa.d
+cp %{SOURCE1} $RPM_BUILD_ROOT/etc/alsa.d
+cp %{SOURCE2} $RPM_BUILD_ROOT/etc/alsa.d
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
@@ -57,8 +63,18 @@ make DESTDIR=$RPM_BUILD_ROOT install
 %dir %{_datadir}/sounds/sf2
 %{_datadir}/sounds/sf2/*
 %doc %{_mandir}/*/*
+/etc/udev
+/etc/alsa.d
 
 %changelog -n awesfx
+* Wed Jan 25 2006 - mls@suse.de
+- converted neededforbuild to BuildRequires
+* Tue Aug 31 2004 - tiwai@suse.de
+- updated to version 0.5.0d.  (misc fixes only)
+* Fri Feb 27 2004 - tiwai@suse.de
+- updated to version 0.5.0b.
+* Wed Feb 04 2004 - tiwai@suse.de
+- updated to version 0.5.0a.
 * Fri Jan 23 2004 - tiwai@suse.de
 - updated to version 0.5.0.  using auto-tools now.
   ALSA emux loader is added.
