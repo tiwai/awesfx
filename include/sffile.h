@@ -72,7 +72,7 @@ typedef struct _SFSampleInfo {
 	/* ver.2 additional info */
 	int32 samplerate;
 	byte originalPitch;
-	byte pitchCorrection;
+	sbyte pitchCorrection;
 	uint16 samplelink;
 	uint16 sampletype;  /*1=mono, 2=right, 4=left, 8=linked, $8000=ROM*/
 	/* optional info */

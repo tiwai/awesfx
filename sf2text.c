@@ -129,9 +129,10 @@ void print_soundfont(FILE *fp, SFInfo *sf)
 /* print string value. escape or convert the letter to octet if necessary. */
 static void print_name(FILE *fp, char *str)
 {
+	int i = 0;
 	unsigned char *p;
 	putc('"', fp);
-	int i = 0;
+
 	for (p = str; *p && i < 20; i++, p++) {
 		if (!isprint(*p))
 			fprintf(fp, "\\%03o", *p);

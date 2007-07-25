@@ -83,6 +83,8 @@ static void usage()
 	      " -N, --increment[=bool]   incremental loading\n"
 	      " -b, --bank=number        append font to the specified bank\n"
 	      " -l, --lock[=bool]        lock the loading fonts\n"
+	      " -v, --verbose[=int]      set verbosity level\n"
+	      " -q, --quiet              don't print error messages\n"
 	      " -C, --compat[=bool]      use v0.4.2 compatible sounds\n",
 	      stderr);
 	fprintf(stderr, " -A, --sense=digit        (compat) set attenuation sensitivity (default=%g)\n", awe_option.atten_sense);
@@ -126,7 +128,7 @@ int main(int argc, char **argv)
 	remove_samples = FALSE;
 	dispmem = FALSE;
 	lock_sf = -1;
-	awe_verbose = 0;
+	awe_verbose = 1;
 	part_list = NULL;
 
 	awe_read_option_file(NULL);
@@ -136,16 +138,16 @@ int main(int argc, char **argv)
 
 	parse_options(argc, argv);
 
-	DEBUG(0,fprintf(stderr, "default bank = %d\n", awe_option.default_bank));
-	DEBUG(0,fprintf(stderr, "default chorus = %d\n", awe_option.default_chorus));
-	DEBUG(0,fprintf(stderr, "default reverb = %d\n", awe_option.default_reverb));
+	DEBUG(1,fprintf(stderr, "default bank = %d\n", awe_option.default_bank));
+	DEBUG(1,fprintf(stderr, "default chorus = %d\n", awe_option.default_chorus));
+	DEBUG(1,fprintf(stderr, "default reverb = %d\n", awe_option.default_reverb));
 	if (awe_option.compatible) {
-		DEBUG(0,fprintf(stderr, "v0.4.2-compatible mode\n"));
-		DEBUG(0,fprintf(stderr, "minimum attenuation = %d\n", awe_option.default_atten));
-		DEBUG(0,fprintf(stderr, "attenuation sense = %g\n", awe_option.atten_sense));
-		DEBUG(0,fprintf(stderr, "decay sense = %g\n", awe_option.decay_sense));
+		DEBUG(1,fprintf(stderr, "v0.4.2-compatible mode\n"));
+		DEBUG(1,fprintf(stderr, "minimum attenuation = %d\n", awe_option.default_atten));
+		DEBUG(1,fprintf(stderr, "attenuation sense = %g\n", awe_option.atten_sense));
+		DEBUG(1,fprintf(stderr, "decay sense = %g\n", awe_option.decay_sense));
 	} else {
-		DEBUG(0,fprintf(stderr, "use new calculation\n"));
+		DEBUG(1,fprintf(stderr, "use new calculation\n"));
 	}
 
 	/*----------------------------------------------------------------*/
@@ -229,6 +231,7 @@ static struct option long_options[] = {
 	{"increment", 2, 0, 'N'},
 	{"clear", 2, 0, 'i'},
 	{"verbose", 2, 0, 'v'},
+	{"quiet", 0, 0, 'q'},
 	{"extract", 1, 0, 'L'},
 	{"lock", 2, 0, 'l'},
 #ifdef BUILD_ASFXLOAD
@@ -242,9 +245,9 @@ static struct option long_options[] = {
 static int option_index;
 
 #ifdef BUILD_ASFXLOAD
-#define OPTION_FLAGS	"MxNivL:lD:"
+#define OPTION_FLAGS	"MxNivqL:lD:"
 #else
-#define OPTION_FLAGS	"MxNivL:lF:D:"
+#define OPTION_FLAGS	"MxNivqL:lF:D:"
 #endif
 
 int awe_get_argument(int argc, char **argv, char *optstr, struct option *args)
@@ -297,6 +300,9 @@ static int parse_options(int argc, char **argv)
 				awe_verbose = atoi(optarg);
 			else
 				awe_verbose++;
+			break;
+		case 'q':
+			awe_verbose = 0;
 			break;
 		case 'L':
 			add_part_list(optarg);

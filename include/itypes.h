@@ -6,6 +6,7 @@
 #define ITYPES_H_DEF
 
 /* 8bit bytes */
+typedef signed char sbyte;
 typedef unsigned char byte;
 
 /* 16bit integers */

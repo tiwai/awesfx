@@ -166,6 +166,9 @@ OPTIONS:
   -v, --verbose[=level]
 	Increase or set the verbosity level.
 
+  -q, --quiet
+	Don't print error messages, equivalent with --verbose=0.
+
   -V, --volume=percent
 	Set the total volume of sounds, provided in percent.
 	Default volume is 70%.
