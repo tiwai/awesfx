@@ -3,12 +3,14 @@
 CARD=${DEVNAME##/dev/snd/hwC}
 CARD=${CARD%%D2}
 
-case $PHYSDEVDRIVER in
-EMU10K1_Audigy)
+case $DEVPATH in
+*/pci*)
+  # Emu10k1 / Audigy, send a MIDI sequence to activate breakout-box
   echo -en "\xf0\x00\x20\x21\x61\x00\x00\x00\x7f\x00\xf7" > /dev/snd/midiC${CARD}D1
   /etc/alsa.d/load-soundfont $CARD default.bnk default.sf2
   ;;
-sbawe)
+*)
+  # SB AWE can use ROM as fallback
   /etc/alsa.d/load-soundfont $CARD default.bnk default.sf2 default.sbk gu11-rom.sf2 GU11-ROM.SF2
   ;;
 esac
