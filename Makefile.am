@@ -3,6 +3,8 @@ SUBDIRS = awelib include samples etc
 bin_PROGRAMS = sfxload asfxload aweset gusload setfx sf2text text2sf sfxtest
 LDADD = awelib/libawe.a
 
+AUTOMAKE_OPTIONS = foreign
+
 INCLUDES = -Iinclude
 
 asfxload_SOURCES = asfxload.c alsa.c
