@@ -1,3 +1,6 @@
+ver.0.5.1a
+	- really fix the build without linux/awe_voice.h
+
 ver.0.5.1
 	- include awe_voice.h into the package (to fix build with 2.6.22
 	  kernel)

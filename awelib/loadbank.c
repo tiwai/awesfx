@@ -24,11 +24,10 @@
 #include <ctype.h>
 #ifdef linux
 #include <linux/soundcard.h>
-#include <linux/awe_voice.h>
 #else
 #include <machine/soundcard.h>
-#include <awe_voice.h>
 #endif
+#include <awe_voice.h>
 #include "util.h"
 #include "awebank.h"
 #include "aweseq.h"

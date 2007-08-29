@@ -21,11 +21,7 @@
 #ifndef AWE_PARM_H_DEF
 #define AWE_PARM_H_DEF
 
-#ifdef linux
-#include <linux/awe_voice.h>
-#else
 #include <awe_voice.h>
-#endif
 
 void awe_init_parm(awe_voice_parm *pp);
 void awe_init_voice(awe_voice_info *vp);
