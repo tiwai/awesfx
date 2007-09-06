@@ -1,3 +1,6 @@
+ver.0.5.1c
+	- oops, I forgot to package COPYING file, released as 0.5.1c
+
 ver.0.5.1b
 	- fix Makefile.am for autoreconf
 	- fix udev script for recent udev versions (that don't pass
