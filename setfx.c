@@ -37,7 +37,7 @@
 /*----------------------------------------------------------------*/
 
 static void usage(void);
-static int getline(FILE *fp);
+static int my_getline(FILE *fp);
 static int nextline(FILE *fp);
 static char *gettok(FILE *fp);
 static char *divtok(char *src, char *divs, int only_one);
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
 	}
 
 	curline = 0;
-	if (!getline(fp))
+	if (!my_getline(fp))
 		return 0;
 
 	seq_init(seq_devname, seq_devidx);
@@ -370,7 +370,7 @@ static void read_chorus(int mode, char *name, int incl, FILE *fp)
  * read a line and parse tokens
  *----------------------------------------------------------------*/
 
-static int getline(FILE *fp)
+static int my_getline(FILE *fp)
 {
 	char *p;
 	curline++;
@@ -393,12 +393,12 @@ static int nextline(FILE *fp)
 {
 	if (connected) {
 		do {
-			if (! getline(fp))
+			if (! my_getline(fp))
 				return FALSE;
 		} while (connected);
 		return TRUE;
 	} else {
-		return getline(fp);
+		return my_getline(fp);
 	}
 }
 
@@ -415,7 +415,7 @@ static char *gettok(FILE *fp)
 	tok = divtok(NULL, " \t\r\n", FALSE);
 	while (tok == NULL || *tok == 0) {
 		if (! connected) return NULL;
-		if (! getline(fp)) return NULL;
+		if (! my_getline(fp)) return NULL;
 		tok = divtok(line, " \t\r\n", FALSE);
 	}
 	return tok;
