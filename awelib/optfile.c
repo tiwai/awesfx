@@ -118,7 +118,8 @@ void awe_read_option_file(char *fname)
 
 	parse_named_option(DEFAULT_ID);
 	if (fname) {
-		strcpy(tmp, fname);
+		strncpy(tmp, fname, sizeof(tmp));
+		fname[sizeof(tmp) - 1] = 0;
 		if ((base = strrchr(tmp, '/')) == NULL)
 			base = tmp; /* no directory path is attached */
 		else
