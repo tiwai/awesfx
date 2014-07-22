@@ -201,7 +201,7 @@ static int do_load_all_banks(AWEOps *ops, int locked)
 		excl_list = awe_merge_loadlist(excl_list, v->list);
 		/* load this file */
 		rc = load_patch(ops, v->name, v->list, NULL, locked, FALSE);
-		if (rc == AWE_RET_ERR && rc == AWE_RET_NOMEM)
+		if (rc == AWE_RET_ERR || rc == AWE_RET_NOMEM)
 			return rc;
 	}
 
@@ -247,7 +247,7 @@ static int do_load_banks(AWEOps *ops, int locked)
 
 		rc = load_patch(ops, v->name, vlist, NULL, locked, TRUE);
 		awe_free_loadlist(vlist);
-		if (rc == AWE_RET_ERR && rc == AWE_RET_NOMEM)
+		if (rc == AWE_RET_ERR || rc == AWE_RET_NOMEM)
 			return rc;
 
 		mark_loaded_presets(vlist, bank_list);
