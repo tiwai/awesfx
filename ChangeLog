@@ -1,3 +1,6 @@
+ver.0.5.1e
+	- fix wrong error condition checks in loadbank.c
+
 ver.0.5.1d
 	- fix possible buffer overflow in awe_read_option_file()
 
