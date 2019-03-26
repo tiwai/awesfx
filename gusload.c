@@ -24,6 +24,9 @@
 #include <string.h>
 #include <math.h>
 #include <sys/fcntl.h>
+#ifdef BUILD_AGUSLOAD
+#include <alsa/asoundlib.h>
+#endif
 #ifdef __FreeBSD__
 #  include <machine/soundcard.h>
 #elif defined(linux)
@@ -34,18 +37,30 @@
 #include "util.h"
 #include "awe_version.h"
 
+#ifdef BUILD_AGUSLOAD
+#define PROGNAME "agusload"
+#else
+#define PROGNAME "gusload"
+#endif
+
 void seq_load_gus(FILE *fd);
 
 
 static void usage()
 {
-	fprintf(stderr, "gusload -- load GUS patch file on AWE32 sound driver\n");
+	fprintf(stderr, PROGNAME " -- load GUS patch file on AWE32 sound driver\n");
 	fprintf(stderr, VERSION_NOTE);
-	fprintf(stderr, "usage: gusload [-options] GUSpatch\n");
-	fprintf(stderr, " -v          verbose mode\n");
-	fprintf(stderr, " -p number   set instrument number (default is internal value)\n");
-	fprintf(stderr, " -b number   set bank number (default is 0)\n");
-	fprintf(stderr, " -k keynote  set fixed keynote\n");
+	fprintf(stderr, "usage: " PROGNAME " [-options] GUSpatch\n"
+#ifdef BUILD_AGUSLOAD
+		" -D, --hwdep=name        specify the hwdep name\n"
+#else
+		" -F, --device=file        specify the device file\n"
+		" -D, --index=number       specify the device index (-1=autoprobe)\n"
+#endif
+		" -v          verbose mode\n"
+		" -p number   set instrument number (default is internal value)\n"
+		" -b number   set bank number (default is 0)\n"
+		" -k keynote  set fixed keynote\n");
 	exit(1);
 }
 
@@ -55,24 +70,38 @@ static int bankchange = -1;
 static int keynote = -1;
 int awe_verbose;
 
+#ifdef BUILD_AGUSLOAD
+#define OPTION_FLAGS	"b:p:k:viD:"
+#else
 #define OPTION_FLAGS	"b:p:k:viF:D:"
+#endif
 
 int main(int argc, char **argv)
 {
 	FILE *fd;
 	char *gusfile;
 	int c;
+#ifdef BUILD_AGUSLOAD
+	char *hwdep_name = NULL;
+#else
 	char *seq_devname = NULL;
 	int seq_devidx = -1;
+#endif
 
 	while ((c = getopt(argc, argv, OPTION_FLAGS)) != -1) {
 		switch (c) {
+#ifdef BUILD_AGUSLOAD
+		case 'D':
+			hwdep_name = optarg;
+			break;
+#else
 		case 'F':
 			seq_devname = optarg;
 			break;
 		case 'D':
 			seq_devidx = atoi(optarg);
 			break;
+#endif
 		case 'v':
 			if (optarg)
 				awe_verbose = atoi(optarg);
@@ -109,7 +138,11 @@ int main(int argc, char **argv)
 	}
 
 	/* open awe sequencer device */
+#ifdef BUILD_AGUSLOAD
+	seq_alsa_init(hwdep_name);
+#else
 	seq_init(seq_devname, seq_devidx);
+#endif
 	if (clear_sample)
 		seq_reset_samples();
 
@@ -119,7 +152,11 @@ int main(int argc, char **argv)
 	DEBUG(0,printf("DRAM memory left = %d kB\n", seq_mem_avail()/1024));
 
 	/* close sequencer */
+#ifdef BUILD_AGUSLOAD
+	seq_alsa_end();
+#else
 	seq_end();
+#endif
 	fclose(fd);
 
 	return 0;
@@ -220,7 +257,9 @@ void seq_load_gus(FILE *fp)
 			exit(1);
 		}
 		patch->key = GUS_PATCH;
+#ifndef BUILD_AGUSLOAD
 		patch->device_no = awe_dev;
+#endif
 		if (preset >= 0)
 			patch->instr_no = preset;
 		else
@@ -290,7 +329,7 @@ void seq_load_gus(FILE *fp)
 		}
 
 		DEBUG(1,fprintf(stderr, "-- transferring\n"));
-		if (write(seqfd, patch, len) == -1) {
+		if (seq_load_rawpatch(patch, len) < 0) {
 			fprintf(stderr, "[Loading GUS %d]\n", j);
 			perror("Error in loading info");
 			exit(1);

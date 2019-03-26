@@ -107,6 +107,11 @@ int seq_remove_samples(void)
 	return snd_hwdep_ioctl(hwdep, SNDRV_EMUX_IOCTL_REMOVE_LAST_SAMPLES, NULL);
 }
 
+int seq_load_rawpatch(void *patch, int len)
+{
+	return snd_hwdep_ioctl(hwdep, SNDRV_EMUX_IOCTL_LOAD_PATCH, patch);
+}
+
 int seq_load_patch(void *patch, int len)
 {
  	awe_patch_info *p;
@@ -130,6 +135,16 @@ int seq_zero_atten(int atten)
 	mode.port = -1;
 	mode.mode = AWE_MD_ZERO_ATTEN;
 	mode.value = atten;
+	mode.value2 = 0;
+	return snd_hwdep_ioctl(hwdep, SNDRV_EMUX_IOCTL_MISC_MODE, &mode);
+}
+
+void seq_set_gus_bank(int bank)
+{
+	struct sndrv_emux_misc_mode mode;
+	mode.port = -1;
+	mode.mode = AWE_MD_GUS_BANK;
+	mode.value = bank;
 	mode.value2 = 0;
 	return snd_hwdep_ioctl(hwdep, SNDRV_EMUX_IOCTL_MISC_MODE, &mode);
 }

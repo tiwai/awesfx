@@ -146,6 +146,11 @@ void seq_set_gus_bank(int bank)
 	SEQ_DUMPBUF();
 }
 
+int seq_load_rawpatch(void *patch, int len)
+{
+	return write(seqfd, patch, len);
+}
+
 int seq_load_patch(void *patch, int len)
 {
 	awe_patch_info *p;

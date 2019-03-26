@@ -38,6 +38,7 @@ int seq_remove_samples(void);
 void seq_initialize_chip(void);
 void seq_set_gus_bank(int bank);
 int seq_load_patch(void *patch, int len);
+int seq_load_rawpatch(void *patch, int len);
 int seq_mem_avail(void);
 
 /* alsa.c */
