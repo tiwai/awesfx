@@ -33,5 +33,6 @@ sfxtest
 awesfx
 aweset
 asfxload
+agusload
 
 include/awe_version.h
