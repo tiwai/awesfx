@@ -1,3 +1,6 @@
+ver.0.5.2
+	- add ALSA-native GUS loader (agusload)
+
 ver.0.5.1e
 	- fix wrong error condition checks in loadbank.c
 

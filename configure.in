@@ -1,4 +1,4 @@
-AC_INIT([awesfx],[0.5.1e],[tiwai@suse.de],[awesfx])
+AC_INIT([awesfx],[0.5.2],[tiwai@suse.de],[awesfx])
 AM_INIT_AUTOMAKE([gnu dist-bzip2])
 AC_CONFIG_SRCDIR([asfxload.c])
 AM_CONFIG_HEADER([include/config.h])
