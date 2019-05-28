@@ -6,7 +6,7 @@ CARD=${CARD%%D2}
 case $DEVPATH in
 */pci*)
   # Emu10k1 / Audigy, send a MIDI sequence to activate breakout-box
-  echo -en "\xf0\x00\x20\x21\x61\x00\x00\x00\x7f\x00\xf7" > /dev/snd/midiC${CARD}D1
+  printf "\xf0\x00\x20\x21\x61\x00\x00\x00\x7f\x00\xf7" > /dev/snd/midiC${CARD}D1
   /etc/alsa.d/load-soundfont $CARD default.bnk default.sf2
   ;;
 *)
