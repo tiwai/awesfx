@@ -146,5 +146,5 @@ void seq_set_gus_bank(int bank)
 	mode.mode = AWE_MD_GUS_BANK;
 	mode.value = bank;
 	mode.value2 = 0;
-	return snd_hwdep_ioctl(hwdep, SNDRV_EMUX_IOCTL_MISC_MODE, &mode);
+	snd_hwdep_ioctl(hwdep, SNDRV_EMUX_IOCTL_MISC_MODE, &mode);
 }
