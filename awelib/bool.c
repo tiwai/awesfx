@@ -110,10 +110,10 @@ char *strtoken(char *src)
 				break;
 			vptr++;
 		} else if (*vptr == '"' || *vptr == '\'') {
-			int prev, quote;
-			prev = quote = *vptr;
+			int quote;
+			quote = *vptr;
 			remove_letter(vptr);
-			for (; *vptr; prev = *vptr, vptr++) {
+			for (; *vptr; vptr++) {
 				if (*vptr == '\\') {
 					remove_letter(vptr);
 					if (*vptr)
